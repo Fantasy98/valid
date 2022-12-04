@@ -1,0 +1,4 @@
+#ignore the large data set in scratch
+/scratch
+# ignore all wandb
+/wandb
