@@ -1,0 +1,17 @@
+Recap Session 2022.12.06 ~ 2022.12.09
+# Main Work
+1. Reproduce the single case y+=30, pr=0.025 
+2. Draft of propsal 
+3. Presetation to Ricardo
+
+# Progress
+1. Successful reproducing 
+2. Proposal Approved
+
+# To Do
+1. Finish proposal & Plan by the next weekend
+2. Make an flowchart for work 
+3. Keep tracking on data and GPU 
+
+# Note
+1. Application of project: at mid of January, end at mid/end of June. 

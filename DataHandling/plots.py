@@ -57,7 +57,7 @@ def threeD_plot(error_val,output_path):
 
     cm =1/2.54
     #fig = plt.figure(figsize=(15*cm,10*cm),dpi=200)
-    fig = plt.figure(figsize=(20*cm,15*cm),dpi=500)
+    fig = plt.figure(figsize=(15*cm,10*cm),dpi=500)
     ax = plt.axes(projection='3d')
     surf = ax.plot_surface(xx, yy, np.transpose(avg), cmap='viridis', edgecolor='none')
     ax.set_xlabel(r'$x^+$',labelpad=10)

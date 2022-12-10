@@ -34,6 +34,7 @@ for snap in dataset:
     
     (dict_for_dataset,target_array) = read_tfrecords(snap,feature_dict,target)
     print(dict_for_dataset.keys())
+    print(dict_for_dataset["u_vel"].shape)
     print(target_array.shape)
     break
 # (dict_for_dataset,target_array) = read_tfrecords(dataset,feature_dict,target)

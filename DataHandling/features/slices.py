@@ -122,8 +122,8 @@ def load_from_scratch(y_plus,var,target,normalized,repeat=10,shuffle_size=100,ba
 
     data=[]
     for name in splits:
-        data_loc=os.path.join(scratch,name)
-        shutil.copy2(os.path.join(save_loc,name),data_loc)
+        data_loc=os.path.join(save_loc,name)
+        # shutil.copy2(os.path.join(save_loc,name),data_loc)
         dataset = tf.data.TFRecordDataset([data_loc],compression_type='GZIP',buffer_size=100,num_parallel_reads=tf.data.experimental.AUTOTUNE)
         dataset=dataset.map(lambda x: read_tfrecords(x,features_dict,target),num_parallel_calls=tf.data.experimental.AUTOTUNE)
         dataset=dataset.shuffle(buffer_size=shuffle_size)
