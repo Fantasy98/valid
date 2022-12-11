@@ -1,0 +1,31 @@
+Script started on 2022-12-11 09:24:47+01:00 [TERM="xterm-256color" TTY="/dev/pts/36" COLUMNS="127" LINES="36"]
+]0;yuning@neptune: /storage3/yuning/thesis[01;32myuning@neptune[00m:[01;34m/storage3/yuning/thesis[00m$ sudo reboot[5Ppythonconda activate yn[10Pnvcc -V[1P-Vidia-smiconda env list[8Ppythonconda activate tflow[13Ppython ip3 install tensorflow --no-cache-dirsn[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cython[Kconda install pytorch==1.11.0 torchvision==0.12.0 torchaudio==0.11.0 cudatoolkit=11.3 -c pytorch[A]0;yuning@neptune: /storage3/yuning/thesis[01;32myuning@neptune[00m:[01;34m/storage3/yuning/thesis[00m$ [C[C[C[C[C[Cactivate yn[K
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[6Plist create -n yn python==3.8[3@ame[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[3PN[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[3@name[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[3P[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Clist [Kactivate yninstall pytorch==1.11.0 torchvision==0.12.0 torchaudio==0.11.0 cudatoolkit=11.3 -c pytorch[A]0;yuning@neptune: /storage3/yuning/thesis[01;32myuning@neptune[00m:[01;34m/storage3/yuning/thesis[00m$ python[K
+[K[A[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cip3 isntall tensorflow --no-cache-dirns[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cython [Kconda activate tflowpython[Kconda env list[4Pnvidia-smi[4Pcc-V -Vconda activate yn[11Ppythonsudo reboot[Klsmod | grep nvidia
+[01;31m[Knvidia[m[K_uvm           1048576  0
+[01;31m[Knvidia[m[K_drm             61440  0
+[01;31m[Knvidia[m[K_modeset       1150976  1 [01;31m[Knvidia[m[K_drm
+[01;31m[Knvidia[m[K              39116800  2 [01;31m[Knvidia[m[K_uvm,[01;31m[Knvidia[m[K_modeset
+drm_kms_helper        184320  1 [01;31m[Knvidia[m[K_drm
+drm                   495616  6 drm_kms_helper,drm_vram_helper,[01;31m[Knvidia[m[K,[01;31m[Knvidia[m[K_drm,ttm
+i2c_[01;31m[Knvidia[m[K_gpu         16384  0
+]0;yuning@neptune: /storage3/yuning/thesis[01;32myuning@neptune[00m:[01;34m/storage3/yuning/thesis[00m$ dmesg | tail -4
+[514528.039191] NVRM: API mismatch: the client has the version 510.108.03, but
+                NVRM: this kernel module has the version 510.85.02.  Please
+                NVRM: make sure that this kernel module and all NVIDIA driver
+                NVRM: components have the same version.
+]0;yuning@neptune: /storage3/yuning/thesis[01;32myuning@neptune[00m:[01;34m/storage3/yuning/thesis[00m$ cat /proc/driver/nvidia/version
+NVRM version: NVIDIA UNIX x86_64 Kernel Module  510.85.02  Tue Jul 12 16:51:23 UTC 2022
+GCC version:  gcc version 9.4.0 (Ubuntu 9.4.0-1ubuntu1~20.04.1) 
+]0;yuning@neptune: /storage3/yuning/thesis[01;32myuning@neptune[00m:[01;34m/storage3/yuning/thesis[00m$ cat /proc/driver/nvidia/version
+NVRM version: NVIDIA UNIX x86_64 Kernel Module  510.85.02  Tue Jul 12 16:51:23 UTC 2022
+GCC version:  gcc version 9.4.0 (Ubuntu 9.4.0-1ubuntu1~20.04.1) 
+]0;yuning@neptune: /storage3/yuning/thesis[01;32myuning@neptune[00m:[01;34m/storage3/yuning/thesis[00m$ cat /sys/module/nvidia/version
+510.85.02
+]0;yuning@neptune: /storage3/yuning/thesis[01;32myuning@neptune[00m:[01;34m/storage3/yuning/thesis[00m$ dkms status
+nvidia, 510.108.03, 5.4.0-132-generic, x86_64: installed
+nvidia, 510.108.03, 5.4.0-135-generic, x86_64: installed
+]0;yuning@neptune: /storage3/yuning/thesis[01;32myuning@neptune[00m:[01;34m/storage3/yuning/thesis[00m$ extit[K[K[Kit
+exit
+
+Script done on 2022-12-11 09:25:50+01:00 [COMMAND_EXIT_CODE="0"]
