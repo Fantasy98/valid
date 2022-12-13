@@ -1,9 +1,10 @@
+import torch 
+from torch.utils.data import TensorDataset
 from tqdm import tqdm
 import os
 import tensorflow as tf
 from DataHandling.features.slices import read_tfrecords,feature_description,slice_loc
-import torch 
-from torch.utils.data import TensorDataset
+
 
 def parse_name(y_plus:int, var:list,target:list,save_type:str,normalized=False):
     # return the filepath name:
