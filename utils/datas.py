@@ -41,14 +41,14 @@ def slice_dir(root_path,y_plus:int, var:list,target:list,save_type:str,normalize
 
 
 
-def TF2Torch(root_path,y_plus,var,target,save_type,normalized=False):
+def TF2Torch(root_path,y_plus,var,target,save_type,normalized):
     # Function for transfer tensorflow dataset into Pytorch data format".pt"
     
 
-    file_path = slice_loc(y_plus,var,target,normalized=False)
+    file_path = slice_loc(y_plus,var,target,normalized=normalized)
     path_test = os.path.join(file_path,save_type)
     feature_dict = feature_description(file_path)
-
+    print(feature_dict)
     dataset = tf.data.TFRecordDataset(
                                     filenames=path_test,
                                     compression_type="GZIP",
@@ -58,10 +58,14 @@ def TF2Torch(root_path,y_plus,var,target,save_type,normalized=False):
 
     numpy_dict = {}
     names = list(feature_dict.keys())
-    names.remove(target[0])
+    for tar in range(len(target)):
+        names.remove(target[tar])
+
     for name in names:
         numpy_dict[name] = []
-    numpy_dict[target[0]] = []
+
+    for tar in range(len(target)):
+        numpy_dict[target[tar]] = []
 
     for snap in tqdm(dataset):
         (dict_for_dataset,target_array) = read_tfrecords(snap,feature_dict,target)
@@ -71,6 +75,7 @@ def TF2Torch(root_path,y_plus,var,target,save_type,normalized=False):
             numpy_dict[name].append(value)
             
         target_array = target_array.numpy()
+        
         numpy_dict[target[0]].append(target_array)
     
     case_path = slice_dir(root_path,y_plus, var,target,save_type,normalized)
