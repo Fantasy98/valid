@@ -527,14 +527,14 @@ def slice_loc(y_plus,var,target,normalized,test=False):
     target_string="|".join(target_sort)
     if test==False:
         if normalized==True:
-            slice_loc=os.path.join("/storage3/yuning/TFData",'y_plus_'+str(y_plus)+"-VARS-"+var_string+"-TARGETS-"+target_string+"-normalized")
+            slice_loc=os.path.join("/home/yuning/thesis/data",'y_plus_'+str(y_plus)+"-VARS-"+var_string+"-TARGETS-"+target_string+"-normalized")
         else:
-            slice_loc=os.path.join("/storage3/yuning/TFData",'y_plus_'+str(y_plus)+"-VARS-"+var_string+"-TARGETS-"+target_string)
+            slice_loc=os.path.join("/home/yuning/thesis/data",'y_plus_'+str(y_plus)+"-VARS-"+var_string+"-TARGETS-"+target_string)
     else:
         if normalized==True:
-            slice_loc=os.path.join("/storage3/yuning/TFData_test",'y_plus_'+str(y_plus)+"-VARS-"+var_string+"-TARGETS-"+target_string+"-normalized")
+            slice_loc=os.path.join("/home/yuning/thesis/data_test",'y_plus_'+str(y_plus)+"-VARS-"+var_string+"-TARGETS-"+target_string+"-normalized")
         else:
-            slice_loc=os.path.join("/storage3/yuning/TFData_test",'y_plus_'+str(y_plus)+"-VARS-"+var_string+"-TARGETS-"+target_string)
+            slice_loc=os.path.join("/home/yuning/thesis/data_test",'y_plus_'+str(y_plus)+"-VARS-"+var_string+"-TARGETS-"+target_string)
    
 
     return slice_loc
