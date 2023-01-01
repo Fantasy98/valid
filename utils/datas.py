@@ -8,7 +8,6 @@ from DataHandling.features.slices import read_tfrecords,feature_description,slic
 from torch.utils.data import Dataset
 class JointDataset(Dataset):
     def __init__(self,x,y) -> None:
-        super(JointDataset).__init__()
         self.x = x 
         self.y = y 
     def __getitem__(self, index):
@@ -74,18 +73,6 @@ def TF2Torch(root_path,y_plus,var,target,save_type,normalized):
     print(f"There are {num_snap} in dataset")
 
     names = list(feature_dict.keys())
-<<<<<<< HEAD
-    for tar in range(len(target)):
-        names.remove(target[tar])
-
-    for name in names:
-        numpy_dict[name] = []
-
-    for tar in range(len(target)):
-        numpy_dict[target[tar]] = []
-
-    for snap in tqdm(dataset):
-=======
     for tar in target:
         names.remove(tar)
     names.sort()
@@ -95,7 +82,6 @@ def TF2Torch(root_path,y_plus,var,target,save_type,normalized):
     
     for snap in tqdm(dataset.cache()):
         indx +=1
->>>>>>> 758c5c460a9b0180130b9196fe6049386240052c
         (dict_for_dataset,target_array) = read_tfrecords(snap,feature_dict,target)
         snap_list = []  
         tar_list = []
@@ -104,10 +90,6 @@ def TF2Torch(root_path,y_plus,var,target,save_type,normalized):
         snap_tensor = torch.stack(snap_list,dim=0)
         
         target_array = target_array.numpy()
-<<<<<<< HEAD
-        
-        numpy_dict[target[0]].append(target_array)
-=======
         for tar in target:
             tar_list.append(torch.from_numpy(target_array))
 
@@ -115,7 +97,6 @@ def TF2Torch(root_path,y_plus,var,target,save_type,normalized):
         features.append(snap_tensor)
         y.append(tar_tensor)
     
->>>>>>> 758c5c460a9b0180130b9196fe6049386240052c
     
         if indx % (num_snap//2) == 0:
             t +=1
