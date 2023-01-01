@@ -1,4 +1,4 @@
-from utils.datas import slice_dir,mkdataset
+from utils.datas import slice_dir,mkdataset,TF2Torch
 import torch 
 from torch.utils.data import DataLoader
 
@@ -9,6 +9,8 @@ y_plus=30
 save_types= ["train","test","validation"]
 root_path = "/home/yuning/thesis/tensor"
 
+# for save_type in save_types:
+#     TF2Torch(root_path,y_plus,var,target,save_type,normalized=False)
 for save_type in save_types:
     mkdataset(root_path,y_plus,var,target,save_type,normalized=False)
 

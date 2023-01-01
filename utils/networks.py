@@ -66,6 +66,7 @@ class FCN(nn.Module):
         out = x[:,:,1:-1,1:-1]
         return out
 
+
 from utils.toolbox import periodic_padding
 class FCN_pad(nn.Module):
     def __init__(self, height,width,channels,knsize,padding) -> None:
@@ -81,27 +82,28 @@ class FCN_pad(nn.Module):
         self.conv3 = nn.Conv2d(in_channels=128,out_channels=256,kernel_size=self.knsize)
         self.conv4 = nn.Conv2d(in_channels=256,out_channels=256,kernel_size=self.knsize)
         
-        self.Tconv1 = nn.ConvTranspose2d(in_channels=256*2,out_channels=256,kernel_size=self.knsize)
-        self.Tconv2 = nn.ConvTranspose2d(in_channels=256+256,out_channels=256,kernel_size=self.knsize)
-        self.Tconv3 = nn.ConvTranspose2d(in_channels=256+128,out_channels=128,kernel_size=self.knsize)
-        self.Tconv4 = nn.ConvTranspose2d(in_channels=128+64,out_channels=64,kernel_size=5)
+        self.Tconv1 = nn.ConvTranspose2d(in_channels=256*2,out_channels=128,kernel_size=self.knsize)
+        self.Tconv2 = nn.ConvTranspose2d(in_channels=256+128,out_channels=256,kernel_size=self.knsize)
+        self.Tconv3 = nn.ConvTranspose2d(in_channels=128+256,out_channels=256,kernel_size=self.knsize)
+        self.Tconv4 = nn.ConvTranspose2d(in_channels=64+256,out_channels=64,kernel_size=5)
         self.out = nn.ConvTranspose2d(in_channels=64+self.channels,out_channels=1,kernel_size=1)
 
         self.initial_norm = nn.BatchNorm2d(self.channels,eps=1e-5,momentum=0.001)
-        self.bn1 = nn.Sequential( nn.ELU(),nn.BatchNorm2d(64,eps=0.0001,momentum=0.005)  )
-        self.bn2 = nn.Sequential( nn.ELU(),nn.BatchNorm2d(128,eps=0.0001,momentum=0.005)  )
-        self.bn3 = nn.Sequential( nn.ELU(),nn.BatchNorm2d(256,eps=0.0001,momentum=0.005)  )
-        self.bn4 = nn.Sequential( nn.ELU(),nn.BatchNorm2d(256,eps=0.0001,momentum=0.005)  )
+        self.bn1 = nn.Sequential( nn.ELU(),nn.BatchNorm2d(64,eps=1e-5,momentum=0.01)  )
+        self.bn2 = nn.Sequential( nn.ELU(),nn.BatchNorm2d(128,eps=1e-5,momentum=0.01)  )
+        self.bn3 = nn.Sequential( nn.ELU(),nn.BatchNorm2d(256,eps=1e-5,momentum=0.01)  )
+        self.bn4 = nn.Sequential( nn.ELU(),nn.BatchNorm2d(256,eps=1e-5,momentum=0.01)  )
         
-        self.tbn1 = nn.Sequential( nn.ELU(),nn.BatchNorm2d(256,eps=0.0001,momentum=0.005)  )
-        self.tbn2 = nn.Sequential( nn.ELU(),nn.BatchNorm2d(256,eps=0.0001,momentum=0.005)  )
-        self.tbn3 = nn.Sequential( nn.ELU(),nn.BatchNorm2d(128,eps=0.0001,momentum=0.005)  )
-        self.tbn4 = nn.Sequential( nn.ELU(),nn.BatchNorm2d(64,eps=0.0001,momentum=0.005)  )
+        self.tbn1 = nn.Sequential( nn.ELU(),nn.BatchNorm2d(128,eps=1e-5,momentum=0.01)  )
+        self.tbn2 = nn.Sequential( nn.ELU(),nn.BatchNorm2d(256,eps=1e-5,momentum=0.01)  )
+        self.tbn3 = nn.Sequential( nn.ELU(),nn.BatchNorm2d(256,eps=1e-5,momentum=0.01)  )
+        self.tbn4 = nn.Sequential( nn.ELU(),nn.BatchNorm2d(64,eps=1e-5,momentum=0.01)  )
     
     def forward(self, inputs):
 
         padded = periodic_padding(inputs,self.padding)
         batch1 = self.initial_norm(padded)    
+
         cnn1 = self.conv1(batch1)     
         batch2 = self.bn1(cnn1)
 

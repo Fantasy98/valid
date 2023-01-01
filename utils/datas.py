@@ -8,7 +8,7 @@ from DataHandling.features.slices import read_tfrecords,feature_description,slic
 from torch.utils.data import Dataset
 class JointDataset(Dataset):
     def __init__(self,x,y) -> None:
-        super(JointDataset).__init__()
+    
         self.x = x 
         self.y = y 
     def __getitem__(self, index):
