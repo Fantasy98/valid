@@ -49,7 +49,7 @@ model.to(device)
 for x,y in tqdm(zip(x_dl,y_dl)):
     for times in range(2):
         pred = model(x[0].float().to(device))
-        loss = loss_fn(pred,y[0].float().to(device))
+        loss = loss_fn(pred , y[0].float().to(device))
         
         optimizer.zero_grad()
         loss.backward()

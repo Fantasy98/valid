@@ -5,6 +5,17 @@ import os
 import tensorflow as tf
 from DataHandling.features.slices import read_tfrecords,feature_description,slice_loc
 
+from torch.utils.data import Dataset
+class JointDataset(Dataset):
+    def __init__(self,x,y) -> None:
+        super(JointDataset).__init__()
+        self.x = x 
+        self.y = y 
+    def __getitem__(self, index):
+        return self.x[index,:,:,:],self.y[index,:,:,:]
+    def __len__(self):
+        return len(self.x)
+
 
 def parse_name(y_plus:int, var:list,target:list,save_type:str,normalized=False):
     # return the filepath name:
@@ -56,7 +67,7 @@ def TF2Torch(root_path,y_plus,var,target,save_type,normalized=False):
                                     filenames=path_test,
                                     compression_type="GZIP",
                                     num_parallel_reads=tf.data.experimental.AUTOTUNE
-                                    )
+                                    ).cache()
     num_snap=0
     for i in dataset:
         num_snap +=1 
@@ -69,6 +80,7 @@ def TF2Torch(root_path,y_plus,var,target,save_type,normalized=False):
     features = []
     y = []
     indx = 0; t = 0
+    
     for snap in tqdm(dataset.cache()):
         indx +=1
         (dict_for_dataset,target_array) = read_tfrecords(snap,feature_dict,target)
@@ -85,6 +97,8 @@ def TF2Torch(root_path,y_plus,var,target,save_type,normalized=False):
         tar_tensor = torch.stack(tar_list,dim=0)
         features.append(snap_tensor)
         y.append(tar_tensor)
+    
+    
         if indx % (num_snap//2) == 0:
             t +=1
             features_tensor = TensorDataset(torch.stack(features,dim=0))
@@ -95,14 +109,40 @@ def TF2Torch(root_path,y_plus,var,target,save_type,normalized=False):
             print(f"The {t} part of feature has been saved, shape = {features_tensor.tensors[0].size()}")
             torch.save(targets_tensor,case_path+"/{}{}.pt".format("targets",t))
             print(f"The {t} part of target has been saved, shape = {targets_tensor.tensors[0].size()}")
+
+
+def mkdataset(root_path,y_plus,var,target,save_type,normalized=False):
+    import os
+    file_path = slice_loc(y_plus,var,target,normalized=False)
+    path_test = os.path.join(file_path,save_type)
+    case_path = slice_dir(root_path,y_plus, var,target,save_type,normalized)
+    
+    list_dir = os.listdir(case_path)
+    file_name = save_type+"1.pt"
+    if file_name in list_dir:
+        print("Dataset has already exist!")
+        return
+
+    for i in range(2):
+        feature_tensor = torch.load(case_path+f"/features{i+1}.pt")
+        target_tensor = torch.load(case_path+f"/targets{i+1}.pt")
+
+        print(f" Feature data loaded, shape = {feature_tensor.tensors[0].size()}")
+        print(f" Target data loaded, shape = {target_tensor.tensors[0].size()}")
+
+
+        jdata = JointDataset(feature_tensor.tensors[0].clone(),target_tensor.tensors[0].clone())
+        torch.save(jdata,case_path+"/{}{}.pt".format(save_type,i+1))
+        print("jointdataset has been saved")
+    
+    print("All jointdatasets have been created, now all the tensor will be removed")
+    list_dir = os.listdir(case_path)
+    for item in list_dir:
+        if save_type  not in item:
+            rm_path = os.path.join(case_path,item)
+            print(f"Removing {rm_path}")
+            os.remove(rm_path)
+    
+    list_dir = os.listdir(case_path)
+    print(f"Now left in dir is {list_dir}")
             
-    # features_tensor = TensorDataset(torch.stack(features,dim=0))
-    # tragets_tensor = TensorDataset(torch.stack(y,dim=0))
-
-    # print(f"feature dataset has shape of {features_tensor.tensors[0].size()}")
-    # print(f"targets dataset has shape of {tragets_tensor.tensors[0].size()}")
-    
-    # torch.save(features_tensor,case_path+"/{}.pt".format("features"))
-    # torch.save(tragets_tensor,case_path+"/{}.pt".format("targets"))
-
-    

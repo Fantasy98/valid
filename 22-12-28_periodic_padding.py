@@ -62,3 +62,28 @@ plt.imshow(pds.permute(3,2,1,0).squeeze(),"jet")
 
 
 # %%
+from utils.toolbox import periodic_padding
+x = torch.randint(1,9,(1,4,3,3))
+xpad = periodic_padding(x,2)
+
+# %%
+import matplotlib.pyplot as plt 
+plt.imshow(x.squeeze()[0,:,:])
+
+# %%
+plt.imshow(xpad.squeeze()[0,:,:])
+# %%
+import matplotlib.pyplot as plt 
+plt.imshow(x.squeeze()[1,:,:])
+
+# %%
+plt.imshow(xpad.squeeze()[1,:,:])
+
+# %%
+import matplotlib.pyplot as plt 
+plt.imshow(x.squeeze()[2,:,:])
+
+# %%
+plt.imshow(xpad.squeeze()[2,:,:])
+
+# %%

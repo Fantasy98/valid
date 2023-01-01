@@ -768,7 +768,7 @@ def unet_new_BN_2(input_features,activation='elu',padding_layers=1):
     conc2=keras.layers.Concatenate()([act3,act5])
     
     cnn6=keras.layers.Conv2DTranspose(weights[1],3)(conc2)
-    batch7=keras.layers.BatchNormalization(-1)(cnn6)
+    batch7=keras.layers.BbatchNormalization(-1)(cnn6)
     act6=keras.layers.Activation(activation)(batch7)
 
     conc3=keras.layers.Concatenate()([act2,act6])
