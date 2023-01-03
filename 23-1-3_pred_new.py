@@ -1,0 +1,49 @@
+import torch 
+from torch import nn 
+from torch.utils.data import DataLoader
+from utils.datas import slice_dir
+from utils.metrics import RMS_error,Glob_error,Fluct_error
+from utils.plots import Plot_2D_snapshots
+from tqdm import tqdm
+import matplotlib.pyplot as plt 
+import numpy as np 
+
+torch.manual_seed(1024)
+device = ("cuda:2" if torch.cuda.is_available() else "cpu")
+print(device)
+
+model_path = "/storage3/yuning/thesis/models/23-1-3/epoch500_2023-01-03 13:33:45.211894.pt"
+model = torch.load(model_path)
+model.to(device)
+
+var=['u_vel',"v_vel","w_vel","pr0.025"]
+target=['pr0.025_flux']
+normalized=False
+y_plus=30
+save_types= ["train","test","validation"]
+root_path = "/storage3/yuning/thesis/tensor/"
+test_path = slice_dir(root_path,y_plus,var,target,"train",normalized)
+print(test_path)
+
+test_dl = DataLoader(torch.load(test_path+"/train1.pt"),batch_size=1,shuffle=True)
+
+RMSErrors = []
+GlobErrors = []
+with torch.no_grad():
+    for batch in test_dl:
+        x,y = batch
+        x = x.float().to(device); y = y.float().squeeze().numpy()
+        pred = model(x)
+        pred = pred.float().squeeze().cpu().numpy()
+
+        rms_error = RMS_error(pred,y)
+        glb_error = Glob_error(pred,y)
+        fluct_error = Fluct_error(pred,y)
+        print(rms_error)
+        print(glb_error)
+        print(fluct_error)
+        RMSErrors.append(rms_error)
+        GlobErrors.append(glb_error)
+        break
+Plot_2D_snapshots(pred,"/storage3/yuning/thesis/fig/23-1-3/pred500_test")
+Plot_2D_snapshots(y,"/storage3/yuning/thesis/fig/23-1-3/target500_test")

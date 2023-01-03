@@ -43,7 +43,7 @@ model.train(True)
 num_step = 508
 i = 0
 loss_hist = []
-EPOCH = 5
+EPOCH =5 
 for epoch in tqdm(range(EPOCH)):
     for batch in train_dl:
         i += 1

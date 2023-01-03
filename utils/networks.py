@@ -88,15 +88,15 @@ class FCN_pad(nn.Module):
         self.out = nn.ConvTranspose2d(in_channels=64+self.channels,out_channels=1,kernel_size=1)
 
         self.initial_norm = nn.BatchNorm2d(self.channels,eps=1e-5,momentum=0.001)
-        self.bn1 = nn.Sequential( nn.ELU(),nn.BatchNorm2d(64,eps=1e-5,momentum=0.01)  )
-        self.bn2 = nn.Sequential( nn.ELU(),nn.BatchNorm2d(128,eps=1e-5,momentum=0.01)  )
-        self.bn3 = nn.Sequential( nn.ELU(),nn.BatchNorm2d(256,eps=1e-5,momentum=0.01)  )
-        self.bn4 = nn.Sequential( nn.ELU(),nn.BatchNorm2d(256,eps=1e-5,momentum=0.01)  )
+        self.bn1 = nn.Sequential( nn.ELU(),nn.BatchNorm2d(64,eps=1e-5,momentum=0.001)  ) 
+        self.bn2 = nn.Sequential( nn.ELU(),nn.BatchNorm2d(128,eps=1e-5,momentum=0.001)  )
+        self.bn3 = nn.Sequential( nn.ELU(),nn.BatchNorm2d(256,eps=1e-5,momentum=0.001)  )
+        self.bn4 = nn.Sequential( nn.ELU(),nn.BatchNorm2d(256,eps=1e-5,momentum=0.001)  )
         
-        self.tbn1 = nn.Sequential( nn.ELU(),nn.BatchNorm2d(128,eps=1e-5,momentum=0.01)  )
-        self.tbn2 = nn.Sequential( nn.ELU(),nn.BatchNorm2d(256,eps=1e-5,momentum=0.01)  )
-        self.tbn3 = nn.Sequential( nn.ELU(),nn.BatchNorm2d(256,eps=1e-5,momentum=0.01)  )
-        self.tbn4 = nn.Sequential( nn.ELU(),nn.BatchNorm2d(64,eps=1e-5,momentum=0.01)  )
+        self.tbn1 = nn.Sequential( nn.ELU(),nn.BatchNorm2d(128,eps=1e-5,momentum=0.001)  )
+        self.tbn2 = nn.Sequential( nn.ELU(),nn.BatchNorm2d(256,eps=1e-5,momentum=0.001)  )
+        self.tbn3 = nn.Sequential( nn.ELU(),nn.BatchNorm2d(256,eps=1e-5,momentum=0.001)  )
+        self.tbn4 = nn.Sequential( nn.ELU(),nn.BatchNorm2d(64,eps=1e-5,momentum=0.001)  )
     
     def forward(self, inputs):
 
