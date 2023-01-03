@@ -35,7 +35,7 @@ activation='elu'
 optimizer="adam"
 loss='mean_squared_error'
 patience=50
-
+#%%
 data=slices.load_from_scratch(y_plus,var,target,normalized,repeat=repeat,shuffle_size=shuffle,batch_s=batch_size)
 train=data[0]
 validation=data[1]

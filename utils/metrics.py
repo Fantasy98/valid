@@ -2,7 +2,7 @@ import numpy as np
 
 def RMS_error(y_pred,y_true):
   if y_pred.shape == y_true.shape and len(y_pred.shape)==2:
-    error = np.sqrt( np.mean( (y_pred-y_true)**2 ) )/np.mean(y_true)
+    error = 100*np.sqrt( np.mean( (y_pred-y_true)**2 ) )/np.mean(y_true)
     # error = np.sqrt( np.mean( (y_pred-y_true)**2 ) )
     return error
   else:

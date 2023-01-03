@@ -50,12 +50,13 @@ print(feature_dict)
 #%%
 num = 0
 for snap in dataset:
-    # parsed = tf.io.parse_single_example(snap,feature_dict)
+    inputs = tf.io.parse_single_example(snap,feature_dict)
     num+=1
-   
+    break
 
 
 # %%
+inputs = dataset.take(1)
 pred_pr = model.predict(inputs)
 #%%
 
