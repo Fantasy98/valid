@@ -6,7 +6,8 @@ from utils.networks import FCN
 from utils.datas import slice_dir
 from torch.utils.data import DataLoader
 
-model = torch.load("/home/yuning/thesis/valid/models/epoch508.pt")
+# model = torch.load("/home/yuning/thesis/valid/models/model100.pt")
+model = torch.load("/home/yuning/thesis/valid/models/23-1-4504.pt")
 model.eval()
 
 # %%
@@ -38,22 +39,36 @@ for batch in test_dl:
         print(pred.size())
         rms = RMS_error(pred.cpu().squeeze().numpy(),y.cpu().squeeze().numpy())
         RMS.append(rms)
+    break
 RMS_np = np.array(RMS)
 print(np.mean(RMS_np))
 # %%
 import matplotlib.pyplot as plt 
+from utils.plots import Plot_2D_snapshots
 plt.figure(0)
-clb = plt.imshow(pred.cpu().squeeze(),"jet")
+clb = Plot_2D_snapshots(pred.cpu().squeeze(),"pred")
 plt.colorbar(clb)
 
 plt.figure(1)
-clb = plt.imshow(y.cpu().squeeze(),"jet")
+clb = Plot_2D_snapshots(y.cpu().squeeze(),"tar")
 plt.colorbar(clb)
+
+plt.figure(2)
+clb = Plot_2D_snapshots(pred.cpu().squeeze()-y.cpu().squeeze(),"error")
+plt.colorbar(clb)
+
 plt.show()
 # %%
 import numpy as np
-from utils.metrics import RMS_error 
+from utils.metrics import RMS_error,Glob_error,Fluct_error
 
-rms = RMS_error(pred.squeeze().numpy(),y.squeeze().numpy())
+rms = RMS_error(pred.cpu().squeeze().numpy(),y.cpu().squeeze().numpy())
+glbrms = Glob_error(pred.cpu().squeeze().numpy(),y.cpu().squeeze().numpy())
+flbrms = Fluct_error(pred.cpu().squeeze().numpy(),y.cpu().squeeze().numpy())
+
+print(glbrms)
 print(rms)
+
+print(flbrms)
+
 # %%
