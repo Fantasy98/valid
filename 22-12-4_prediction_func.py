@@ -40,7 +40,7 @@ print(model.summary())
 #%%
 (preds,targets) = predict(model,y_plus,var,target,normalized=False)
 #%%
-result_path = "/home/yuning/thesis/valid/results"
+result_path = "/home/yuning/thesis/models/trained"
 model_result_path = os.path.join(result_path,model_name)
 if os.path.exists(model_result_path) is False:
   os.mkdir(model_result_path)

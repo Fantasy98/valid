@@ -35,29 +35,15 @@ from keras import models
 model = models.load_model(model_path)
 print(model.summary())
 # %%
-file_path = slice_loc(y_plus,var,target,normalized=False)
-path_test = os.path.join(file_path,"validation")
-print(path_test)
-dataset = tf.data.TFRecordDataset(
-                                    filenames=path_test,
-                                    compression_type="GZIP",
-                                    num_parallel_reads=tf.data.experimental.AUTOTUNE
-                                    )
-
-feature_dict = feature_description(file_path)
-print(feature_dict)
-
-#%%
-num = 0
-for snap in dataset:
-    inputs = tf.io.parse_single_example(snap,feature_dict)
-    num+=1
-    break
-
+data=slices.load_from_scratch(y_plus,var,target,normalized,
+                              repeat=1,shuffle_size=100,batch_s=1)
+train=data[0]
+validation=data[1]
 
 # %%
-inputs = dataset.take(1)
+inputs = validation.take(1)
 pred_pr = model.predict(inputs)
+
 #%%
 
 pred = np.squeeze(pred_pr)

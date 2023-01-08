@@ -9,9 +9,9 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 import numpy as np 
 
-torch.backends.cudnn.deterministic = True
-torch.manual_seed(0)
-np.random.seed(0)
+
+# torch.backends.cudnn.deterministic = True
+torch.manual_seed(100)
 
 
 device = ("cuda" if torch.cuda.is_available() else "cpu")
@@ -23,7 +23,7 @@ batch_size = 2;
 model = FCN_Pad_Xaiver(HEIGHT,WIDTH,CHANNELS,KNSIZE,padding)
 
 loss_fn = nn.MSELoss()
-optimizer = torch.optim.Adam(model.parameters(),lr=1e-3,eps=1e-7)
+optimizer = torch.optim.Adam(model.parameters(),lr=1e-3,eps=1e-7,betas=(0.9,0.999))
 
 var=['u_vel',"v_vel","w_vel","pr0.025"]
 target=['pr0.025_flux']
@@ -34,12 +34,13 @@ root_path = "/home/yuning/thesis/tensor"
 train_path = slice_dir(root_path,y_plus,var,target,"train",normalized)
 print(f"Data will be loaded from {train_path}")
 
-train_dl = DataLoader(torch.load(train_path+"/train1.pt"),batch_size=batch_size, shuffle=False)
+train_dl = DataLoader(torch.load(train_path+"/train1.pt"),batch_size=batch_size, shuffle=True)
+
 model.initial()
 model.to(device)
 model.train(True)
 
-num_step = 500; i = 0
+num_step = 504; i = 0
 loss_hist = []
 for batch in tqdm(train_dl):
     i += 1

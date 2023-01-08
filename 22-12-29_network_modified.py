@@ -1,9 +1,9 @@
-from utils.networks import FCN_pad
+from utils.networks import FCN_Pad_Xaiver
 import torch
 
 height = 256;width = 256;channels=4;knsize =3;padding = 8
 
-model = FCN_pad(height,width,channels,knsize,padding)
+model = FCN_Pad_Xaiver(height,width,channels,knsize,padding)
 
 
 print(model.eval())

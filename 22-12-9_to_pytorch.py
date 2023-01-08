@@ -33,12 +33,12 @@ dataset = tf.data.TFRecordDataset(
                                     )
 
 
-target_path = "/home/yuning/thesis/valid/tensors"
-case_path = os.path.join(target_path,"y_plus_30-VARS-pr0.025_u_vel_v_vel_w_vel-TARGETS-pr0.025_flux")
-if os.path.exists(case_path) is False:
-    os.mkdir(case_path)
-    print(f"Made case path {case_path}")
-# numpy_dict = {}
+# target_path = "/home/yuning/thesis/valid/tensors"
+# case_path = os.path.join(target_path,"y_plus_30-VARS-pr0.025_u_vel_v_vel_w_vel-TARGETS-pr0.025_flux")
+# if os.path.exists(case_path) is False:
+#     os.mkdir(case_path)
+#     print(f"Made case path {case_path}")
+# # numpy_dict = {}
 names = list(feature_dict.keys())
 for tar in target:
     names.remove(tar)
@@ -62,10 +62,12 @@ for snap in tqdm(dataset):
     snap_list = []  
     tar_list = []
     for name in names:
-        value = dict_for_dataset[name].numpy()
+        value = dict_for_dataset[name]
+        print(value)
         snap_list.append(torch.from_numpy(dict_for_dataset[name].numpy()))
     snap_tensor = torch.stack(snap_list,dim=0)
-    
+    print(snap_tensor.dtype)
+    break
     target_array = target_array.numpy()
     for tar in target:
         # numpy_dict[tar].append(target_array)
@@ -74,14 +76,15 @@ for snap in tqdm(dataset):
     tar_tensor = torch.stack(tar_list,dim=0)
     features.append(snap_tensor)
     y.append(tar_tensor)
-    if indx % (num_snap//2) == 0:
-        t +=1
-        features_tensor = TensorDataset(torch.stack(features,dim=0))
-        tragets_tensor = TensorDataset(torch.stack(y,dim=0))
-        features.clear()
-        y.clear()
-        torch.save(features_tensor,case_path+"/{}{}.pt".format("features",t))
-        torch.save(tragets_tensor,case_path+"/{}{}.pt".format("targets",t))
+    break
+    # if indx % (num_snap//2) == 0:
+    #     t +=1
+    #     features_tensor = TensorDataset(torch.stack(features,dim=0))
+    #     tragets_tensor = TensorDataset(torch.stack(y,dim=0))
+    #     features.clear()
+    #     y.clear()
+    #     torch.save(features_tensor,case_path+"/{}{}.pt".format("features",t))
+    #     torch.save(tragets_tensor,case_path+"/{}{}.pt".format("targets",t))
 #%%
 
 

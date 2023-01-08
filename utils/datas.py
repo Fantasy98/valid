@@ -76,7 +76,7 @@ def TF2Torch(root_path,y_plus,var,target,save_type,normalized=False):
     names = list(feature_dict.keys())
     for tar in target:
         names.remove(tar)
-    names.sort()
+    print(names)
     features = []
     y = []
     indx = 0; t = 0
