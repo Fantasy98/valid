@@ -98,16 +98,16 @@ def TF2Torch(root_path,y_plus,var,target,save_type,normalized):
         y.append(tar_tensor)
     
     
-        if indx % (num_snap//2) == 0:
-            t +=1
-            features_tensor = TensorDataset(torch.stack(features,dim=0))
-            targets_tensor = TensorDataset(torch.stack(y,dim=0))
-            features.clear()
-            y.clear()
-            torch.save(features_tensor,case_path+"/{}{}.pt".format("features",t))
-            print(f"The {t} part of feature has been saved, shape = {features_tensor.tensors[0].size()}")
-            torch.save(targets_tensor,case_path+"/{}{}.pt".format("targets",t))
-            print(f"The {t} part of target has been saved, shape = {targets_tensor.tensors[0].size()}")
+        # if indx % (num_snap//2) == 0:
+        #     t +=1
+    features_tensor = TensorDataset(torch.stack(features,dim=0))
+    targets_tensor = TensorDataset(torch.stack(y,dim=0))
+    features.clear()
+    y.clear()
+    torch.save(features_tensor,case_path+"/{}.pt".format("features"))
+    print(f"The {t} part of feature has been saved, shape = {features_tensor.tensors[0].size()}")
+    torch.save(targets_tensor,case_path+"/{}.pt".format("targets"))
+    print(f"The {t} part of target has been saved, shape = {targets_tensor.tensors[0].size()}")
 
 
 def mkdataset(root_path,y_plus,var,target,save_type,normalized=False):
@@ -117,22 +117,22 @@ def mkdataset(root_path,y_plus,var,target,save_type,normalized=False):
     case_path = slice_dir(root_path,y_plus, var,target,save_type,normalized)
     
     list_dir = os.listdir(case_path)
-    file_name = save_type+"1.pt"
+    file_name = save_type+".pt"
     if file_name in list_dir:
         print("Dataset has already exist!")
         return
 
-    for i in range(2):
-        feature_tensor = torch.load(case_path+f"/features{i+1}.pt")
-        target_tensor = torch.load(case_path+f"/targets{i+1}.pt")
+    # for i in range(2):
+    feature_tensor = torch.load(case_path+f"/features.pt")
+    target_tensor = torch.load(case_path+f"/targets.pt")
 
-        print(f" Feature data loaded, shape = {feature_tensor.tensors[0].size()}")
-        print(f" Target data loaded, shape = {target_tensor.tensors[0].size()}")
+    print(f" Feature data loaded, shape = {feature_tensor.tensors[0].size()}")
+    print(f" Target data loaded, shape = {target_tensor.tensors[0].size()}")
 
 
-        jdata = JointDataset(feature_tensor.tensors[0].clone(),target_tensor.tensors[0].clone())
-        torch.save(jdata,case_path+"/{}{}.pt".format(save_type,i+1))
-        print("jointdataset has been saved")
+    jdata = JointDataset(feature_tensor.tensors[0].clone(),target_tensor.tensors[0].clone())
+    torch.save(jdata,case_path+"/{}.pt".format(save_type))
+    print("jointdataset has been saved")
     
     print("All jointdatasets have been created, now all the tensor will be removed")
     list_dir = os.listdir(case_path)
