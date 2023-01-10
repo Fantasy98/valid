@@ -404,7 +404,6 @@ class FCN_Pad_Xaiver_gain(nn.Module):
         batch5 = self.elu(self.bn4(cnn4))
 
 
-
         tconv1 = (self.Tconv1(torch.concat([cnn4,batch5],dim=1)))
         batch6 = self.elu(self.tbn1(tconv1))
         

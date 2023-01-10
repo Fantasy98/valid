@@ -1,13 +1,3 @@
-import torch 
-from torch import nn 
-from torch.utils.data import DataLoader
-from utils.datas import slice_dir
-from utils.metrics import RMS_error,Glob_error,Fluct_error
-from utils.plots import Plot_2D_snapshots
-from tqdm import tqdm
-import matplotlib.pyplot as plt 
-import numpy as np 
-
 torch.manual_seed(1024)
 device = ("cuda:2" if torch.cuda.is_available() else "cpu")
 print(device)
@@ -50,4 +40,3 @@ with torch.no_grad():
 # Plot_2D_snapshots(pred,"/storage3/yuning/thesis/fig/23-1-10/pred50_test")
 # Plot_2D_snapshots(y,"/storage3/yuning/thesis/fig/23-1-10/target50_test")
 # Plot_2D_snapshots((pred-y)/y,"/storage3/yuning/thesis/fig/23-1-10/error50_test")
-
