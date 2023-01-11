@@ -840,7 +840,7 @@ def final_skip_no_sep_padding_batchNinput(input_features,activation='elu',paddin
         reshape_list.append(reshape)
     conc=keras.layers.Concatenate()(reshape_list)
     
-
+    from keras import layers
     batch1=keras.layers.BatchNormalization(-1)(conc)
     cnn1=keras.layers.Conv2D(64,5,activation=activation)(batch1)
     

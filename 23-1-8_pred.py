@@ -16,13 +16,13 @@ test_path = slice_dir(root_path,y_plus,var,target,"test",normalized)
 print(test_path)
 
 torch.manual_seed(0)
-test_dl = DataLoader(torch.load(test_path+"/test1.pt"),shuffle=True,batch_size=1)
+test_dl = DataLoader(torch.load(test_path+"/test2.pt"),shuffle=True,batch_size=1)
 
 #%%
-num_step = 500
+num_step = 1
 # model = torch.load("/home/yuni/ng/thesis/valid/models/model100.pt")
-model = torch.load("/home/yuning/thesis/valid/models/23-1-8{}.pt".format(num_step))
-model.eval()
+model = torch.load("/home/yuning/thesis/valid/models/23-1-9{}.pt".format(num_step))
+# model.eval()
 
 
 # %%
@@ -40,15 +40,15 @@ with torch.no_grad():
 import matplotlib.pyplot as plt 
 from utils.plots import Plot_2D_snapshots
 plt.figure(0)
-clb = Plot_2D_snapshots(pred.cpu().squeeze(),"/home/yuning/thesis/valid/fig/23-1-8/pred{}".format(num_step))
+clb = Plot_2D_snapshots(pred.cpu().squeeze(),"/home/yuning/thesis/valid/fig/23-1-9/pred{}".format(num_step))
 plt.colorbar(clb)
 
 plt.figure(1)
-clb = Plot_2D_snapshots(y.cpu().squeeze(),"/home/yuning/thesis/valid/fig/23-1-8/tar{}".format(num_step))
+clb = Plot_2D_snapshots(y.cpu().squeeze(),"/home/yuning/thesis/valid/fig/23-1-9/tar{}".format(num_step))
 plt.colorbar(clb)
 
 plt.figure(2)
-clb = Plot_2D_snapshots(pred.cpu().squeeze()-y.cpu().squeeze(),"/home/yuning/thesis/valid/fig/23-1-8/error{}".format(num_step))
+clb = Plot_2D_snapshots(pred.cpu().squeeze()-y.cpu().squeeze(),"/home/yuning/thesis/valid/fig/23-1-9/error{}".format(num_step))
 plt.colorbar(clb)
 
 plt.show()
