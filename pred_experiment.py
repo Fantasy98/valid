@@ -7,6 +7,8 @@ from utils.datas import slice_dir
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
+import matplotlib.pyplot as plt 
+from utils.plots import Plot_2D_snapshots,Plot_multi
 var=['u_vel',"v_vel","w_vel","pr0.025"]
 target=['pr0.025_flux']
 normalized=False
@@ -16,7 +18,7 @@ root_path = "/home/yuning/thesis/tensor"
 test_path = slice_dir(root_path,y_plus,var,target,"test",normalized)
 print(test_path)
 
-torch.manual_seed(0)
+torch.manual_seed(100)
 test_dl = DataLoader(torch.load(test_path+"/test2.pt"),shuffle=True,batch_size=1)
 
 #%%
@@ -38,31 +40,33 @@ with torch.no_grad():
 print(pred.shape)
 
 #%%
-# tk1 = model.CCTEncoder.tokenizer
-tk = model.CCTEncoder
+tk1 = model.CCTEncoder.tokenizer
+tk = model.CCTEncoder   
 pred_trans = tk(x)
-# pred_trans = pred_trans.squeeze().detach().cpu().numpy()
-pred_trans = pred_trans.transpose(1,2).reshape(4,256,256).detach().cpu().numpy()
-
+    # pred_trans = pred_trans.squeeze().detach().cpu().numpy()
+pred_trans = pred_trans.transpose(2,1).reshape(4,256,256).detach().cpu().numpy()
+pred_transi = np.empty(shape=(4,256,256))
 import matplotlib.pyplot as plt
 for i in range(4):
     plt.figure(i+10)
-    clb = plt.imshow(pred_trans[i,:,:],"plasma")
-    plt.colorbar(clb)
-    # plt.savefig("/home/yuning/thesis/valid/fig/23-2-3/{}feature{}".format(model_name,i))
-# %%
-import matplotlib.pyplot as plt 
-from utils.plots import Plot_2D_snapshots
+    pred_transi[i,:,:] = pred_trans[i,:,:].T
+    # pred_transi = (pred_transi-pred_transi.min())/(pred_transi.max()-pred_transi.min())
+Plot_multi(pred_transi,["u","v","w",r"$\theta$"],save_dir="/home/yuning/thesis/valid/fig/23-2-6/{}_TransformerFeature{}".format(model_name,i))
+
+
+
+
+#%%
 plt.figure(0)
-clb = Plot_2D_snapshots(pred.cpu().squeeze(),"/home/yuning/thesis/valid/fig/23-2-3/pred{}".format(model_name))
+clb = Plot_2D_snapshots(pred.cpu().squeeze(),"/home/yuning/thesis/valid/fig/23-2-6/pred{}".format(model_name))
 plt.colorbar(clb)
 
 plt.figure(1)
-clb = Plot_2D_snapshots(y.cpu().squeeze(),"/home/yuning/thesis/valid/fig/23-2-3/tar{}".format(model_name))
+clb = Plot_2D_snapshots(y.cpu().squeeze(),"/home/yuning/thesis/valid/fig/23-2-6/tar{}".format(model_name))
 plt.colorbar(clb)
 
 plt.figure(2)
-clb = Plot_2D_snapshots(pred.cpu().squeeze()-y.cpu().squeeze(),"/home/yuning/thesis/valid/fig/23-2-3/error{}".format(model_name))
+clb = Plot_2D_snapshots(pred.cpu().squeeze()-y.cpu().squeeze(),"/home/yuning/thesis/valid/fig/23-2-6/error{}".format(model_name))
 plt.colorbar(clb)
 # %%
 import numpy as np

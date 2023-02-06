@@ -118,8 +118,9 @@ def mkdataset(root_path,y_plus,var,target,save_type,normalized=False):
     case_path = slice_dir(root_path,y_plus, var,target,save_type,normalized)
     
     list_dir = os.listdir(case_path)
-    file_name = save_type+"1.pt"
-    if file_name in list_dir:
+    file_name1 = save_type+"1.pt"
+    file_name2 = save_type+"2.pt"
+    if file_name1 and file_name2 in list_dir:
         print("Dataset has already exist!")
         return
 

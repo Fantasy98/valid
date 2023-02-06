@@ -5,7 +5,7 @@ import numpy as np
 from matplotlib import pyplot as plt 
 from utils.datas import slice_dir
 from utils.CBAM import CBAM
-from utils.plots import Surface_Plot
+from utils.plots import Surface_Plot,Plot_2D_snapshots
 from scipy import stats
 
 from torch.nn import functional as F
@@ -22,9 +22,11 @@ test_path = slice_dir(root_path,y_plus,var,target,"test",normalized)
 print(f"Data will be loaded from {test_path}")
 
 test_dl = DataLoader(torch.load(test_path+"/test1.pt"),batch_size=batch_size, shuffle=True)
-model_name = "y_plus_30_InOut2_Epoch=100"
+# model_name = "y_plus_30_FCN_Pad_Base"
+# model_name = "y_plus_30_fullskipCCT_2layer_16heads_2epoch_1batch"
 model_name = "y_plus_30_fullskipCCT_1layer_2epoch_1batch"
 
+# model = torch.load("/home/yuning/thesis/valid/models/23-1-17_{}.pt".format(model_name))
 model = torch.load("/home/yuning/thesis/valid/models/23-2-1_{}.pt".format(model_name))
 # %%
 
@@ -34,14 +36,15 @@ for batch in test_dl:
     x,y = batch
     x.requires_grad= True
     pred = model(x.float().cuda())
-    for i in range(6):
-        for j in range(6):
-            mean_pred = pred[:,:,125+i,125+j]
-        # mean_pred = pred.mean()
-            mean_pred.backward(retain_graph = True)
-            saliency = x.grad[0]
+    # for i in range(256):
+        # for j in range(256):
+            # mean_pred = pred[:,:,125+i,125+j]
+            # mean_pred = pred[:,:,i,j]
+    mean_pred = (pred**2).sqrt().mean()
+    mean_pred.backward(retain_graph = True)
+    saliency = x.grad[0]
         
-            Sal.append(saliency)
+    Sal.append(saliency)
     break
 
 # %%
@@ -50,17 +53,22 @@ Saliency = np.array([i.numpy() for i in Sal])
 # %%
 var=['u_vel',"v_vel","w_vel","pr0025"]
 for i in range(len(var)):
-    u = Saliency.mean(0)[i,28:86,28:86]
-    u = (u -u.mean())/(u.std())
-    feature = x[0,i,28:86,28:86].squeeze().detach().numpy()
-    feature = (feature-feature.mean())/(feature.std())
-    to_show = 0.1*feature + u
-    clb =plt.imshow(to_show,"jet")
-    plt.colorbar(clb)
+    u = Saliency.mean(0)[i,:,:]
+    # u = (u -u.mean())/(u.std())
+    # feature = x[0,i,28:86,28:86].squeeze().detach().numpy()
+    # feature = (feature-feature.mean())/(feature.std())
+    # to_show = 0.1*feature + u
+    # clb =plt.imshow(to_show,"jet")
+    # plt.colorbar(clb)
+    u = (u-u.min())/(u.max()-u.min())
+    # u = (u-u.mean())/(u.std())
 
+    Plot_2D_snapshots(u,"/home/yuning/thesis/valid/fig/23-2-6/grad_{}_rms_{}".format(var[i],model_name))
     # Surface_Plot((u-u.min())/(u.max()-u.min()))
-    plt.savefig("/home/yuning/thesis/valid/fig/23-2-3/grad_{}_mid_{}".format(var[i],model_name),bbox_inches = "tight")
+
+    # plt.savefig("/home/yuning/thesis/valid/fig/23-2-6/grad_{}_3Drms_{}".format(var[i],model_name))
     plt.clf()
+    
     print(f"Grad map of {var[i]} has been saved",flush=True)
     print(f"Mean Gradient of feature is {u.mean()}")
 # z = u 

@@ -1,9 +1,11 @@
 from utils.datas import TF2Torch,mkdataset
-var=['u_vel',"v_vel","w_vel","pr0.2"]
-target=['pr0.2_flux']
+var=['u_vel',"v_vel","w_vel","pr1"]
+target=['pr1_flux']
 normalized=False
-y_plus=50
-save_types= ["train","test","validation"]
+y_plus=30
+# save_types= ["test","validation"]
+save_types= ["test"]
+# save_types= ["train"]
 
 for save_type in save_types:
     print(f"Dealing with {save_type}")

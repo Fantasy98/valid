@@ -28,7 +28,7 @@ batch_size = 1;
 # fcn_model.apply(Init_Conv)
 model = FullSkip_FCN_CCT(num_layers=2,num_heads=16)
 # model = VIT_model
-model_name = "y_plus_30_fullskipCCT_2layer_16heads_1epoch_1batch_SGD1e-2"
+model_name = "y_plus_50_pr02_fullskipCCT_2layer_16heads_1epoch_1batch"
 loss_fn = nn.MSELoss()
 # loss_fn = DiceBCELoss()
 optimizer = torch.optim.AdamW(model.parameters(),lr=1e-3,eps=1e-7,betas=(0.9,0.999),weight_decay=2e-2)
@@ -79,7 +79,7 @@ for epoch in range(1):
                 # if i == num_step:
                     # break
 
-torch.save(model,"/home/yuning/thesis/valid/models/23-2-3_{}.pt".format(model_name))
+torch.save(model,"/home/yuning/thesis/valid/models/23-2-6_{}.pt".format(model_name))
 print("Training finished, model has been saved!")
 
 plt.figure(0,figsize=(12,10))
@@ -87,6 +87,6 @@ plt.semilogy(loss_hist,"r",lw=2.5)
 plt.xlabel("Steps")
 plt.ylabel("Loss")
 plt.grid()
-plt.savefig("/home/yuning/thesis/valid/fig/23-2-3/loss{}".format(model_name))
+plt.savefig("/home/yuning/thesis/valid/fig/23-2-6/loss{}".format(model_name))
 
 
