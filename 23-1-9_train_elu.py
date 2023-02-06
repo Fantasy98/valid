@@ -54,6 +54,7 @@ for num in tqdm(range(num_step)):
         loss.backward()
         optimizer.step()
         loss_hist.append(loss.item())
+        print(loss.item())
     # if i == num_step:
     #     break
 

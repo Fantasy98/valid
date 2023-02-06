@@ -14,13 +14,14 @@ from DataHandling.models import predict
 from utils.data_decompose import decompse_feature
 import torch 
 from torch.utils.data import TensorDataset 
-var=['u_vel',"v_vel","w_vel","pr0.025"]
-target=['pr0.025_flux']
-normalized=False
-y_plus=30
-
-file_path = slice_loc(y_plus,var,target,normalized=False)
-path_test = os.path.join(file_path,"test")
+var=['u_vel',"v_vel","w_vel"]
+# var=["pr0.025"]
+target=["tau_wall"]
+normalized=True
+y_plus=50
+datatype = "train"
+file_path = slice_loc(y_plus,var,target,normalized=normalized)
+path_test = os.path.join(file_path,datatype)
 print(path_test)
 
 feature_dict = feature_description(file_path)
@@ -33,11 +34,11 @@ dataset = tf.data.TFRecordDataset(
                                     )
 
 
-# target_path = "/home/yuning/thesis/valid/tensors"
-# case_path = os.path.join(target_path,"y_plus_30-VARS-pr0.025_u_vel_v_vel_w_vel-TARGETS-pr0.025_flux")
-# if os.path.exists(case_path) is False:
-#     os.mkdir(case_path)
-#     print(f"Made case path {case_path}")
+target_path = "/home/yuning/thesis/tensor"
+case_path = os.path.join(target_path,"y_plus_30-VARS-pr0.025")
+if os.path.exists(case_path) is False:
+    os.mkdir(case_path)
+    print(f"Made case path {case_path}")
 # # numpy_dict = {}
 names = list(feature_dict.keys())
 for tar in target:
@@ -54,37 +55,38 @@ print(num_snap)
 features = []
 y = []
 #%%
-indx = 0; t = 0
+# indx = 0; t = 0
 from tqdm import tqdm
 for snap in tqdm(dataset):
-    indx +=1
+    # indx +=1
     (dict_for_dataset,target_array) = read_tfrecords(snap,feature_dict,target)
     snap_list = []  
     tar_list = []
-    for name in names:
-        value = dict_for_dataset[name]
-        print(value)
-        snap_list.append(torch.from_numpy(dict_for_dataset[name].numpy()))
-    snap_tensor = torch.stack(snap_list,dim=0)
-    print(snap_tensor.dtype)
-    break
+    # for name in names:
+    #     if name == var[0]:
+    #         value = dict_for_dataset[name]
+    #         # print(value)
+    #         snap_list.append(torch.from_numpy(dict_for_dataset[name].numpy()))
+    # snap_tensor = torch.stack(snap_list,dim=0)
+# print(snap_tensor.dtype)
+    # print(snap_tensor.shape)
     target_array = target_array.numpy()
     for tar in target:
         # numpy_dict[tar].append(target_array)
         tar_list.append(torch.from_numpy(target_array))
 
     tar_tensor = torch.stack(tar_list,dim=0)
-    features.append(snap_tensor)
+    # features.append(snap_tensor)
     y.append(tar_tensor)
-    break
+    # break
     # if indx % (num_snap//2) == 0:
     #     t +=1
-    #     features_tensor = TensorDataset(torch.stack(features,dim=0))
-    #     tragets_tensor = TensorDataset(torch.stack(y,dim=0))
+# features_tensor = TensorDataset(torch.stack(features,dim=0))
+tragets_tensor = TensorDataset(torch.stack(y,dim=0))
     #     features.clear()
     #     y.clear()
-    #     torch.save(features_tensor,case_path+"/{}{}.pt".format("features",t))
-    #     torch.save(tragets_tensor,case_path+"/{}{}.pt".format("targets",t))
+# torch.save(features_tensor,case_path+"/{}_{}.pt".format(names[0],datatype))
+torch.save(tragets_tensor,case_path+"/{}_{}.pt".format(target[0],datatype))
 #%%
 
 

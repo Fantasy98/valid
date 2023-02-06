@@ -1,0 +1,213 @@
+(base) yuning@pavilion:~$ ssh -p2224 yuning@neptune.eecs.kth.se
+Welcome to Ubuntu 20.04.3 LTS (GNU/Linux 5.4.0-137-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+  System information as of Wed 18 Jan 2023 03:24:26 PM CET
+
+  System load:              0.07
+  Usage of /home:           72.0% of 389.63GB
+  Memory usage:             1%
+  Swap usage:               0%
+  Temperature:              49.0 C
+  Processes:                971
+  Users logged in:          1
+  IPv4 address for docker0: 172.17.0.1
+  IPv4 address for enp6s0:  130.237.218.60
+  IPv6 address for enp6s0:  2001:6b0:1:1da0:264b:feff:fe46:71aa
+
+  => /storage4 is using 90.6% of 3.58TB
+  => /storage0 is using 97.5% of 3.58TB
+  => /storage3 is using 92.1% of 3.58TB
+  => /storage2 is using 94.9% of 3.58TB
+
+ * Strictly confined Kubernetes makes edge and IoT secure. Learn how MicroK8s
+   just raised the bar for easy, resilient and secure K8s cluster deployment.
+
+   https://ubuntu.com/engage/secure-kubernetes-at-the-edge
+
+123 updates can be applied immediately.
+3 of these updates are standard security updates.
+To see these additional updates run: apt list --upgradable
+
+New release '22.04.1 LTS' available.
+Run 'do-release-upgrade' to upgrade to it.
+
+
+Last login: Wed Jan 18 13:25:26 2023 from 130.229.156.201
+yuning@neptune:~$ cd /storage3/yuning/thesis
+yuning@neptune:/storage3/yuning/thesis$ conda activate torch 
+(torch) yuning@neptune:/storage3/yuning/thesis$ python 23-1-18_train_y+30_uvwpr0.025_pr0.025_CBAM_InOut2.py 
+2023-01-18 15:27:19.919667: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 AVX512F AVX512_VNNI FMA
+To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2023-01-18 15:27:20.156279: I tensorflow/core/util/port.cc:104] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2023-01-18 15:27:20.990429: W tensorflow/compiler/xla/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libnvinfer.so.7'; dlerror: libnvinfer.so.7: cannot open shared object file: No such file or directory
+2023-01-18 15:27:20.990486: W tensorflow/compiler/xla/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libnvinfer_plugin.so.7'; dlerror: libnvinfer_plugin.so.7: cannot open shared object file: No such file or directory
+2023-01-18 15:27:20.990491: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Cannot dlopen some TensorRT libraries. If you would like to use Nvidia GPU with TensorRT, please make sure the missing libraries mentioned above are installed properly.
+cuda:0
+Checking: Linear(in_features=4, out_features=4, bias=True)
+Checking: ReLU()
+Checking: Linear(in_features=4, out_features=4, bias=True)
+Checking: Sequential(
+  (0): Linear(in_features=4, out_features=4, bias=True)
+  (1): ReLU()
+  (2): Linear(in_features=4, out_features=4, bias=True)
+)
+Checking: ChannelAttention(
+  (bottleneck): Sequential(
+    (0): Linear(in_features=4, out_features=4, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=4, out_features=4, bias=True)
+  )
+)
+Checking: Conv2d(2, 1, kernel_size=(1, 1), stride=(1, 1))
+It has been initialized
+Checking: SpatialAttention(
+  (conv): Conv2d(2, 1, kernel_size=(1, 1), stride=(1, 1))
+)
+Checking: CBAM(
+  (channel_attention): ChannelAttention(
+    (bottleneck): Sequential(
+      (0): Linear(in_features=4, out_features=4, bias=True)
+      (1): ReLU()
+      (2): Linear(in_features=4, out_features=4, bias=True)
+    )
+  )
+  (spatial_attention): SpatialAttention(
+    (conv): Conv2d(2, 1, kernel_size=(1, 1), stride=(1, 1))
+  )
+)
+Checking: Conv2d(4, 64, kernel_size=(5, 5), stride=(1, 1))
+It has been initialized
+Checking: Conv2d(64, 128, kernel_size=(3, 3), stride=(1, 1))
+It has been initialized
+Checking: Conv2d(128, 256, kernel_size=(3, 3), stride=(1, 1))
+It has been initialized
+Checking: Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1))
+It has been initialized
+Checking: ConvTranspose2d(512, 128, kernel_size=(3, 3), stride=(1, 1))
+It has been initialized
+Checking: ConvTranspose2d(384, 256, kernel_size=(3, 3), stride=(1, 1))
+It has been initialized
+Checking: ConvTranspose2d(384, 256, kernel_size=(3, 3), stride=(1, 1))
+It has been initialized
+Checking: ConvTranspose2d(320, 64, kernel_size=(5, 5), stride=(1, 1))
+It has been initialized
+Checking: Linear(in_features=64, out_features=64, bias=True)
+Checking: ReLU()
+Checking: Linear(in_features=64, out_features=64, bias=True)
+Checking: Sequential(
+  (0): Linear(in_features=64, out_features=64, bias=True)
+  (1): ReLU()
+  (2): Linear(in_features=64, out_features=64, bias=True)
+)
+Checking: ChannelAttention(
+  (bottleneck): Sequential(
+    (0): Linear(in_features=64, out_features=64, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=64, out_features=64, bias=True)
+  )
+)
+Checking: Conv2d(2, 1, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2))
+It has been initialized
+Checking: SpatialAttention(
+  (conv): Conv2d(2, 1, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2))
+)
+Checking: CBAM(
+  (channel_attention): ChannelAttention(
+    (bottleneck): Sequential(
+      (0): Linear(in_features=64, out_features=64, bias=True)
+      (1): ReLU()
+      (2): Linear(in_features=64, out_features=64, bias=True)
+    )
+  )
+  (spatial_attention): SpatialAttention(
+    (conv): Conv2d(2, 1, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2))
+  )
+)
+Checking: ConvTranspose2d(68, 1, kernel_size=(1, 1), stride=(1, 1))
+It has been initialized
+Checking: BatchNorm2d(4, eps=0.001, momentum=0.99, affine=True, track_running_stats=True)
+Checking: BatchNorm2d(64, eps=0.001, momentum=0.99, affine=True, track_running_stats=True)
+Checking: BatchNorm2d(128, eps=0.001, momentum=0.99, affine=True, track_running_stats=True)
+Checking: BatchNorm2d(256, eps=0.001, momentum=0.99, affine=True, track_running_stats=True)
+Checking: BatchNorm2d(256, eps=0.001, momentum=0.99, affine=True, track_running_stats=True)
+Checking: BatchNorm2d(128, eps=0.001, momentum=0.99, affine=True, track_running_stats=True)
+Checking: BatchNorm2d(256, eps=0.001, momentum=0.99, affine=True, track_running_stats=True)
+Checking: BatchNorm2d(256, eps=0.001, momentum=0.99, affine=True, track_running_stats=True)
+Checking: BatchNorm2d(64, eps=0.001, momentum=0.99, affine=True, track_running_stats=True)
+Checking: ELU(alpha=1.0)
+Checking: FCN_Pad_Xaiver_CBAM_InOut2(
+  (incab): CBAM(
+    (channel_attention): ChannelAttention(
+      (bottleneck): Sequential(
+        (0): Linear(in_features=4, out_features=4, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=4, out_features=4, bias=True)
+      )
+    )
+    (spatial_attention): SpatialAttention(
+      (conv): Conv2d(2, 1, kernel_size=(1, 1), stride=(1, 1))
+    )
+  )
+  (conv1): Conv2d(4, 64, kernel_size=(5, 5), stride=(1, 1))
+  (conv2): Conv2d(64, 128, kernel_size=(3, 3), stride=(1, 1))
+  (conv3): Conv2d(128, 256, kernel_size=(3, 3), stride=(1, 1))
+  (conv4): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1))
+  (Tconv1): ConvTranspose2d(512, 128, kernel_size=(3, 3), stride=(1, 1))
+  (Tconv2): ConvTranspose2d(384, 256, kernel_size=(3, 3), stride=(1, 1))
+  (Tconv3): ConvTranspose2d(384, 256, kernel_size=(3, 3), stride=(1, 1))
+  (Tconv4): ConvTranspose2d(320, 64, kernel_size=(5, 5), stride=(1, 1))
+  (tcb4): CBAM(
+    (channel_attention): ChannelAttention(
+      (bottleneck): Sequential(
+        (0): Linear(in_features=64, out_features=64, bias=True)
+        (1): ReLU()
+        (2): Linear(in_features=64, out_features=64, bias=True)
+      )
+    )
+    (spatial_attention): SpatialAttention(
+      (conv): Conv2d(2, 1, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2))
+    )
+  )
+  (out): ConvTranspose2d(68, 1, kernel_size=(1, 1), stride=(1, 1))
+  (initial_norm): BatchNorm2d(4, eps=0.001, momentum=0.99, affine=True, track_running_stats=True)
+  (bn1): BatchNorm2d(64, eps=0.001, momentum=0.99, affine=True, track_running_stats=True)
+  (bn2): BatchNorm2d(128, eps=0.001, momentum=0.99, affine=True, track_running_stats=True)
+  (bn3): BatchNorm2d(256, eps=0.001, momentum=0.99, affine=True, track_running_stats=True)
+  (bn4): BatchNorm2d(256, eps=0.001, momentum=0.99, affine=True, track_running_stats=True)
+  (tbn1): BatchNorm2d(128, eps=0.001, momentum=0.99, affine=True, track_running_stats=True)
+  (tbn2): BatchNorm2d(256, eps=0.001, momentum=0.99, affine=True, track_running_stats=True)
+  (tbn3): BatchNorm2d(256, eps=0.001, momentum=0.99, affine=True, track_running_stats=True)
+  (tbn4): BatchNorm2d(64, eps=0.001, momentum=0.99, affine=True, track_running_stats=True)
+  (elu): ELU(alpha=1.0)
+)
+There are  4 GPUs!
+Device: [0, 1, 2, 3] will be used !
+/storage3/yuning/thesis/tensor/y_plus_30-VARS-pr0.025_u_vel_v_vel_w_vel-TARGETS-pr0.025_flux/train
+/storage3/yuning/thesis/tensor/y_plus_30-VARS-pr0.025_u_vel_v_vel_w_vel-TARGETS-pr0.025_flux/validation
+/storage3/yuning/thesis/models/2023-01-18 maded!
+The model will be saved to:
+ /storage3/yuning/thesis/models/2023-01-18/y_plus_30-VARS-pr0.025_u_vel_v_vel_w_vel-TARGETS-pr0.025_flux_CBAM_InOut_EPOCH=100.pt
+Epoch 1 of 100
+Training
+100%|█████████████████████████████████████████| 238/238 [01:48<00:00,  2.19it/s]
+Training loss = 0.08602619884014322
+Validating
+100%|███████████████████████████████████████████| 68/68 [00:12<00:00,  5.52it/s]
+Validation loss = 0.005710966264208157
+Epoch 2 of 100
+Training
+100%|█████████████████████████████████████████| 238/238 [01:45<00:00,  2.25it/s]
+Training loss = 0.0008526816001581971
+Validating
+100%|███████████████████████████████████████████| 68/68 [00:12<00:00,  5.43it/s]
+Validation loss = 0.00020375807927099652
+Epoch 3 of 100
+Training
+ 80%|████████████████████████████████▋        | 190/238 [01:37<00:34,  1.37it/s]
+
+
+

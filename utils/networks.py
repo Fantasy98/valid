@@ -2,6 +2,24 @@ import torch
 from torch import nn 
 import matplotlib.pyplot as plt 
 
+def Init_Conv(m):
+    """
+    A function for initializing conv and convtranspose layer 
+    The weight will be init by xavier_uniform and bias will be init by zeros
+    Example:
+        model = FCN()
+        model.apply(Init_Conv)
+    """
+    
+    print(f"Checking: {m}",flush=True)
+    if type(m) == nn.Conv2d or type(m) == nn.ConvTranspose2d:
+        # print(f"the layer is {m.__class__.__name__}")
+        nn.init.xavier_uniform_(m.weight)
+        nn.init.zeros_(m.bias)
+        print("It has been initialized",flush=True)
+    
+
+
 class FCN(nn.Module):
     def __init__(self, height,width,channels,knsize) -> None:
         super(FCN,self).__init__()
@@ -386,7 +404,6 @@ class FCN_Pad_Xaiver_gain(nn.Module):
         print("All layer has been correctly initialized")
 
     def forward(self, inputs):
-
         padded = periodic_padding(inputs,self.padding)
         batch1 = self.initial_norm(padded)    
 
@@ -426,4 +443,167 @@ class FCN_Pad_Xaiver_gain(nn.Module):
                 self.padding:-self.padding]
         
         return out
+
+
+class FCN_ResNet(nn.Module):
+    def __init__(self, height,width,channels,knsize,padding) -> None:
+        super(FCN_ResNet,self).__init__()
+        self.height,self.width,self.channels = height,width,channels
+        self.knsize = knsize
+        self.padding = padding
+
+        self.conv1 = nn.Conv2d(in_channels=self.channels,out_channels=64,kernel_size=5)
+        self.resconv1 = nn.Conv2d(in_channels=self.channels,out_channels=64,kernel_size=5)
+        
+        self.conv2 = nn.Conv2d(in_channels=64,out_channels=128,kernel_size=self.knsize)
+        self.resconv2 = nn.Conv2d(in_channels=64,out_channels=128,kernel_size=self.knsize)
+        
+        self.conv3 = nn.Conv2d(in_channels=128,out_channels=256,kernel_size=self.knsize)
+        self.resconv3 = nn.Conv2d(in_channels=128,out_channels=256,kernel_size=self.knsize)
+        
+        self.conv4 = nn.Conv2d(in_channels=256,out_channels=256,kernel_size=self.knsize)
+        self.resconv4 = nn.Conv2d(in_channels=256,out_channels=256,kernel_size=self.knsize)
+        
+
+        self.Tconv1 = nn.ConvTranspose2d(in_channels=256*2,out_channels=128,kernel_size=self.knsize)
+        self.Tresconv1 = nn.ConvTranspose2d(in_channels=256*2,out_channels=128,kernel_size=self.knsize)
+        
+        self.Tconv2 = nn.ConvTranspose2d(in_channels=256+128,out_channels=256,kernel_size=self.knsize)
+        self.Tresconv2 = nn.ConvTranspose2d(in_channels=256+128,out_channels=256,kernel_size=self.knsize)
+        
+        self.Tconv3 = nn.ConvTranspose2d(in_channels=128+256,out_channels=256,kernel_size=self.knsize)
+        self.Tresconv3 = nn.ConvTranspose2d(in_channels=128+256,out_channels=256,kernel_size=self.knsize)
+        
+        self.Tconv4 = nn.ConvTranspose2d(in_channels=64+256,out_channels=64,kernel_size=5)
+        self.Tresconv4 = nn.ConvTranspose2d(in_channels=64+256,out_channels=64,kernel_size=5)
+        
+        self.out = nn.ConvTranspose2d(in_channels=64+self.channels,out_channels=1,kernel_size=1)
+
+        self.initial_norm = nn.BatchNorm2d(self.channels,eps=1e-3,momentum=0.99)
+        self.bn1 = nn.BatchNorm2d(64,eps=1e-3,momentum=0.99)  
+        self.bn2 = nn.BatchNorm2d(128,eps=1e-3,momentum=0.99)  
+        self.bn3 = nn.BatchNorm2d(256,eps=1e-3,momentum=0.99)  
+        self.bn4 = nn.BatchNorm2d(256,eps=1e-3,momentum=0.99)  
+        
+        self.tbn1 = nn.BatchNorm2d(128,eps=1e-3,momentum=0.99)  
+        self.tbn2 = nn.BatchNorm2d(256,eps=1e-3,momentum=0.99)  
+        self.tbn3 = nn.BatchNorm2d(256,eps=1e-3,momentum=0.99)  
+        self.tbn4 = nn.BatchNorm2d(64,eps=1e-3,momentum=0.99) 
     
+        self.elu =nn.ELU()
+        # self.down = nn.MaxPool2d(2)
+
+    def forward(self, inputs):
+        padded = periodic_padding(inputs,self.padding)
+        batch = self.initial_norm(padded)    
+        
+        cnn1 = (self.conv1(batch))
+        batch1 =(self.bn1(cnn1))
+        res1 = self.resconv1(batch)
+        add1 = self.elu(torch.add(batch1,res1))
+        
+        cnn2 = self.conv2(add1)
+        batch2= self.bn2(cnn2)
+        res2 = self.resconv2(add1)
+        add2 = self.elu(torch.add(batch2,res2))
+        
+        cnn3 = self.conv3(add2)
+        batch3 = self.bn3(cnn3)
+        res3 = self.resconv3(add2)
+        add3 = self.elu(torch.add(batch3,res3)) 
+
+        cnn4 = self.conv4(add3)
+        batch4 = self.bn4(cnn4)
+        res4 = self.resconv4(add3)
+        add4 = self.elu(torch.add(batch4,res4))
+        
+        tcov1 = self.Tconv1(torch.cat([cnn4,add4],dim=1))
+        batch5 = self.tbn1(tcov1)
+        tres1 = self.Tresconv1(torch.cat([cnn4,add4],dim=1))
+        add5 = self.elu(torch.add(batch5,tres1))
+
+        tcov2 = self.Tconv2(torch.cat([cnn3,add5],dim=1))
+        batch6= self.tbn2(tcov2)
+        tres2 = self.Tresconv2(torch.cat([cnn3,add5],dim=1))
+        add6 = self.elu(torch.add(batch6,tres2))
+         
+        tcov3 = self.Tconv3(torch.cat([cnn2,add6],dim=1))
+        batch7 = self.tbn3(tcov3)
+        tres3 = self.Tresconv3(torch.cat([cnn2,add6],dim=1))
+        add7 = self.elu(torch.add(batch7,tres3))
+        
+        tcov4 =self.Tconv4(torch.cat([cnn1,add7],dim=1))
+        batch8 = self.tbn4(tcov4)
+        tres4 = self.Tresconv4(torch.cat([cnn1,add7],dim=1))
+        add8 = self.elu(torch.add(batch8,tres4))
+        
+        x = self.out(torch.cat([padded,add8],dim=1))        
+
+        #Corp the padding
+        out = x[:,
+                :,
+                self.padding:-self.padding,
+                self.padding:-self.padding]
+        
+        return out
+
+class FCN_ResNet_NoSkip(nn.Module):
+    def __init__(self, height,width,channels,knsize,padding) -> None:
+        super(FCN_ResNet_NoSkip,self).__init__()
+        self.height,self.width,self.channels = height,width,channels
+        self.knsize = knsize
+        self.padding = padding
+
+        self.conv1 = nn.Conv2d(in_channels=self.channels,out_channels=64,kernel_size=5)
+        self.conv2 = nn.Conv2d(in_channels=64,out_channels=128,kernel_size=self.knsize)
+        self.conv3 = nn.Conv2d(in_channels=128,out_channels=256,kernel_size=self.knsize)
+        self.conv4 = nn.Conv2d(in_channels=256,out_channels=256,kernel_size=self.knsize)
+        
+
+        self.Tconv1 = nn.ConvTranspose2d(in_channels=256,out_channels=128,kernel_size=self.knsize) 
+        self.Tconv2 = nn.ConvTranspose2d(in_channels=128,out_channels=256,kernel_size=self.knsize)
+        self.Tconv3 = nn.ConvTranspose2d(in_channels=256,out_channels=256,kernel_size=self.knsize)
+        self.Tconv4 = nn.ConvTranspose2d(in_channels=256,out_channels=64,kernel_size=5)
+        self.out = nn.ConvTranspose2d(in_channels=64,out_channels=1,kernel_size=1)
+
+        self.initial_norm = nn.BatchNorm2d(self.channels,eps=1e-3,momentum=0.99)
+        self.bn1 = nn.BatchNorm2d(64,eps=1e-3,momentum=0.99)  
+        self.bn2 = nn.BatchNorm2d(128,eps=1e-3,momentum=0.99)  
+        self.bn3 = nn.BatchNorm2d(256,eps=1e-3,momentum=0.99)  
+        self.bn4 = nn.BatchNorm2d(256,eps=1e-3,momentum=0.99)  
+        
+        self.tbn1 = nn.BatchNorm2d(128,eps=1e-3,momentum=0.99)  
+        self.tbn2 = nn.BatchNorm2d(256,eps=1e-3,momentum=0.99)  
+        self.tbn3 = nn.BatchNorm2d(256,eps=1e-3,momentum=0.99)  
+        self.tbn4 = nn.BatchNorm2d(64,eps=1e-3,momentum=0.99) 
+    
+        self.elu =nn.ELU()
+    
+    def forward(self,input):
+        conv=[self.conv1,self.conv2,self.conv3,self.conv4]
+        tconv =[self.Tconv1,self.Tconv2,self.Tconv3,self.Tconv4]
+        bn = [self.bn1,self.bn2,self.bn3,self.bn4]
+        tbn = [self.tbn1,self.tbn2,self.tbn3,self.tbn4]
+
+        x = self.initial_norm(periodic_padding(input,self.padding))
+
+        for down in range(len(conv)):
+            CONV = conv[down](x)
+            BN = bn[down](CONV)
+            x = self.elu(torch.add(BN,CONV))
+           
+        
+        for up in range(len(tconv)):
+            TCONV = tconv[up](x)
+            TBN = tbn[up](TCONV)
+            x = self.elu(torch.add(TBN,TCONV))
+           
+        
+        x = self.out(x)
+        #Corp the padding
+        out = x[:,
+                :,
+                self.padding:-self.padding,
+                self.padding:-self.padding]
+        
+        return out
