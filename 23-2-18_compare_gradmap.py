@@ -1,36 +1,10 @@
-#%%
-import torch 
-import os
-from torch import nn 
-from utils.networks import FCN
-from utils.datas import slice_dir
-from torch.utils.data import DataLoader
-from tqdm import tqdm
-import matplotlib.pyplot as plt
-import shap
-import numpy as np
-from scipy import signal
-from utils.plots import Plot_2D_snapshots,Plot_multi
-#%%
-save_fig = "fig/23-2-23/"
-names = ["vit_16h_4l","fcn","cbam","cnn"]
+import numpy as np 
+save_fig = "fig/23-2-24/"
+names = ["fcn","cbam","vit_mul"]
 
 y_plus = 15
 prs = ["0025","02","071","1"]
-# prs = ["0025"]
-PR = [0.025,0.2,0.71,1]
-model_names = ["ViT","FCN","CBAM","Simple FCN"]
-#%%
 
-np_path = "/home/yuning/thesis/valid/results/y_plus_15/2d_correlation/"
-FeatureCorr = []
-for pr in prs:
-    pr_path = os.path.join(np_path,f"pr{pr}.npy")
-    pr_np = np.load(pr_path)
-    FeatureCorr.append(pr_np)
-#%%
-
-# %%
 def Plot_Gradient_Map(U,names,save_dir):
     from matplotlib import cbook
     from matplotlib import cm
@@ -44,17 +18,21 @@ def Plot_Gradient_Map(U,names,save_dir):
     u_tau = Re_Tau*nu
 
     # xx, yy = np.mgrid[0:256:256j, 0:256:256j]
-    xx, yy = np.mgrid[0:256:20j, 0:256:20j]
-    # xx, yy = np.mgrid[-10:10:20j, -10:10:20j]
+    # xx, yy = np.mgrid[0:256:20j, 0:256:20j]
+    xx, yy = np.mgrid[-10:10:20j, -10:10:20j]
+    # xx, yy = np.mgrid[-25:25:50j, -25:25:50j]
 
 
+    # x_range=12
     x_range=6
     z_range=6
 
     # gridpoints_x=int(255)+1
     gridpoints_x=int(10)+1
+    # gridpoints_x=int(50)+1
     # gridpoints_z=int(255)+1
     gridpoints_z=int(10)+1
+    # gridpoints_z=int(50)+1
 
 
     x_plus_max=x_range*u_tau/nu
@@ -65,10 +43,9 @@ def Plot_Gradient_Map(U,names,save_dir):
     z_plus_max=np.round(z_plus_max).astype(int)
 
     axis_range_x=np.array([1900,2850])
-    # axis_range_x=np.array([2400,2850])
+    
     
     axis_range_z=np.array([950,1420])
-    # axis_range_z=np.array([1050,1220])
     # axis_range_x=np.array([0,950,1900,2850,3980,4740])
     # axis_range_z=np.array([0,470,950,1420,1900,2370])
 
@@ -82,7 +59,7 @@ def Plot_Gradient_Map(U,names,save_dir):
     cms = 1/2.54
 
     # Set up plot
-    fig,axes = plt.subplots(2,2,figsize=(20*cms,36*cms),dpi=300,
+    fig,axes = plt.subplots(4,3,figsize=(20*cms,36*cms),dpi=300,
                             # sharex=True,sharey=True,
                             subplot_kw=dict(projection='3d'))
     axes = axes.flatten()
@@ -116,7 +93,60 @@ def Plot_Gradient_Map(U,names,save_dir):
         axes[i].axis("off")
     cbar =fig.colorbar(surf,ax=axes.flatten().tolist(),aspect =30,shrink=0.9,orientation="horizontal",location="bottom")
     # cbar.formatter.set_powerlimits((0,0))
-    fig.savefig(save_dir,bbox_inches="tight")     
-# %%
-# Plot_Gradient_Map((pr071_np-pr071_np.min())/(pr071_np.max()-pr071_np.min()),["u","v","w",r"$\theta$"],"y30_Pr071")
-# %%
+    fig.savefig(save_dir,bbox_inches="tight")
+
+for pr in prs:
+    U = []
+    V = []
+    W = []
+    T = []
+    for name in names:
+        data_dir = f"pred/y{y_plus}_pr{pr}_{name}_gradmap.npz"
+        grad_map = np.load(data_dir)
+        gdmp = grad_map["gradmap"]
+        
+        # Noise cancelling of gradient map
+        for i in range(4):
+            gdmp[:,i,:,:] = np.sqrt(gdmp[:,i,:,:]**2) - gdmp[:,i,:,:].mean()
+        
+        gdmp = gdmp.mean(0)
+        u = gdmp[0,118:138,118:138] 
+        v = gdmp[1,118:138,118:138] 
+        w = gdmp[2,118:138,118:138] 
+        t = gdmp[3,118:138,118:138] 
+
+        # u = gdmp[0,103:153,103:153]
+        # v = gdmp[1,103:153,103:153]
+        # w = gdmp[2,103:153,103:153]
+        # t = gdmp[3,103:153,103:153]
+        u = (u-gdmp.min())/(gdmp.max()-gdmp.min())
+        v = (v-gdmp.min())/(gdmp.max()-gdmp.min())
+        w = (w-gdmp.min())/(gdmp.max()-gdmp.min())
+        t = (t-gdmp.min())/(gdmp.max()-gdmp.min())
+        
+        
+
+        U.append(u)
+        V.append(v)
+        W.append(w)
+        T.append(t)
+    U = np.array(U)
+    V = np.array(V)
+    W = np.array(W)
+    T = np.array(T)
+    Plot_Gradient_Map(U,["FCN","CBAM","ViT"],save_fig+f"fluct_y{y_plus}_pr{pr}_U_compare")
+    Plot_Gradient_Map(V,["FCN","CBAM","ViT"],save_fig+f"fluct_y{y_plus}_pr{pr}_V_compare")
+    Plot_Gradient_Map(W,["FCN","CBAM","ViT"],save_fig+f"fluct_y{y_plus}_pr{pr}_W_compare")
+    Plot_Gradient_Map(T,["FCN","CBAM","ViT"],save_fig+f"fluct_y{y_plus}_pr{pr}_T_compare")
+    
+
+
+
+print(U.shape,V.shape,W.shape,T.shape)
+
+
+# VAR = [U,V,W,T]
+
+#%%
+
+

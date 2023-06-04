@@ -3,17 +3,13 @@ from torch.utils.data import DataLoader
 from torch import nn 
 from utils.datas import slice_dir 
 from utils.networks import FCN_Pad_Xaiver_gain,Init_Conv
-from utils.newnets import FCN_4,FCN_4,FCN_Pad_CBAM_Res
-from utils.toolbox import periodic_padding
-from utils.Vision_Transformer import ViT, ViTBackbone
-from utils.vit import VisionTransformer
-from utils.loss import DiceBCELoss
+from NNs import HeatFormer_mut, HeatFormer_passive
 import os 
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 import numpy as np 
 from transformer.cct import CCT
-from transformer.FCN_CCT import FCN_CCT,Skip_FCN_CCT,FullSkip_FCN_CCT
+from transformer.FCN_CCT import FCN_CCT,Skip_FCN_CCT,FullSkip_FCN_CCT, FullSkip_Mul_FCN_CCT
 # torch.backends.cudnn.deterministic = True
 torch.manual_seed(100)
 
@@ -26,12 +22,13 @@ batch_size = 1;
 # VIT_model = CCT()
 # fcn_model = FCN_Pad_Xaiver_gain(HEIGHT,WIDTH,CHANNELS,KNSIZE,8)
 # fcn_model.apply(Init_Conv)
-model = FullSkip_FCN_CCT(num_layers=2,num_heads=16)
+model = FullSkip_Mul_FCN_CCT(num_heads=16,num_layers=1)
 # model = VIT_model
-model_name = "y_plus_50_pr02_fullskipCCT_2layer_16heads_1epoch_1batch"
+model_name = "y_plus_30_pr0025_Mul_CCT_2layer_16heads_1epoch_1batch"
 loss_fn = nn.MSELoss()
 # loss_fn = DiceBCELoss()
-optimizer = torch.optim.AdamW(model.parameters(),lr=1e-3,eps=1e-7,betas=(0.9,0.999),weight_decay=2e-2)
+optimizer = torch.optim.AdamW(model.parameters(),lr=1e-2,eps=1e-7,betas=(0.9,0.999),
+                              weight_decay=2e-2)
 # optimizer = torch.optim.SGD(model.parameters(),lr=1e-2,momentum=0.9,weight_decay=2e-2)
 var=['u_vel',"v_vel","w_vel","pr0.025"]
 # var=['tau_wall',"pr0.025"]
@@ -79,7 +76,7 @@ for epoch in range(1):
                 # if i == num_step:
                     # break
 
-torch.save(model,"/home/yuning/thesis/valid/models/23-2-6_{}.pt".format(model_name))
+torch.save(model,"/home/yuning/thesis/valid/models/23-2-20_{}.pt".format(model_name))
 print("Training finished, model has been saved!")
 
 plt.figure(0,figsize=(12,10))
@@ -87,6 +84,6 @@ plt.semilogy(loss_hist,"r",lw=2.5)
 plt.xlabel("Steps")
 plt.ylabel("Loss")
 plt.grid()
-plt.savefig("/home/yuning/thesis/valid/fig/23-2-6/loss{}".format(model_name))
+plt.savefig("/home/yuning/thesis/valid/fig/23-2-20/loss{}".format(model_name))
 
 

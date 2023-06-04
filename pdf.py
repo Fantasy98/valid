@@ -11,12 +11,47 @@ y50_ERS_base = np.load("/home/yuning/thesis/valid/pred/y_plus_30-VARS-pr0.025_u_
 y30_ERS_cbam = np.load("/home/yuning/thesis/valid/pred/y_plus_30-VARS-pr0.025_u_vel_v_vel_w_vel-TARGETS-pr0.025_flux_CBAM2_EPOCH=100/pred.npy")
 y50_ERS_cbam = np.load("/home/yuning/thesis/valid/pred/y_plus_30-VARS-pr0.025_u_vel_v_vel_w_vel-TARGETS-pr0.025_flux_FCN_EPOCH=100/pred.npy")
 # %%
+exam = ( y50_ERS_base -y50_ERS_base.mean() )
+exam = exam/ np.sqrt(np.mean(exam**2))
+exam = exam.reshape(-1,1)
+n = len(exam)
+std_dev = np.std(exam)
+bin_width = 3.5 * std_dev * n**(-1/3)
+num_bins = int(np.ceil((np.max(exam) - np.min(exam)) / bin_width))
 
-sns.kdeplot(y30_ERS_base.mean(0).flatten(),label="DNS")
-sns.kdeplot(y30_ERS_cbam.mean(0).flatten(),label="Attention")
-sns.kdeplot(y50_ERS_cbam.mean(0).flatten(),label="FCN Baseline")
+hist, bins = np.histogram(exam,bins=num_bins,density=True)
+a_centers = ( bins[:-1] + bins[1:] )/2
+
+
+exam2 = ( y50_ERS_cbam -y50_ERS_cbam.mean() )
+exam2 = exam2/ np.sqrt(np.mean(exam2**2))
+exam2 = exam2.reshape(-1,1)
+n = len(exam2)
+std_dev = np.std(exam2)
+bin_width = 3.5 * std_dev * n**(-1/3)
+num_bins = int(np.ceil((np.max(exam2) - np.min(exam2)) / bin_width))
+
+hist2, bins2 = np.histogram(exam2,bins=num_bins,density=True)
+a_centers2 = ( bins2[:-1] + bins2[1:] )/2
+#%%
+
+plt.figure()
+
+plt.semilogy(a_centers,hist,lw=1.5,label="DNS")
+plt.semilogy(a_centers2,hist2,lw=1.5,label="DL")
+
+plt.xlim([-10,10])
 plt.legend()
-plt.savefig("PDF Mean")
+plt.xticks(np.linspace(-10,10,5))
+plt.savefig("PDF",bbox_inches="tight")
+# plt.xticks(range(-10,12,10))
+#%%
+
+# sns.kdeplot(y30_ERS_base.mean(0).flatten(),label="DNS")
+# sns.kdeplot(y30_ERS_cbam.mean(0).flatten(),label="Attention")
+# sns.kdeplot(y50_ERS_cbam.mean(0).flatten(),label="FCN Baseline")
+# plt.legend()
+# plt.savefig("PDF Mean")
 # sns.kdeplot(y30_ERS_base.mean(0).flatten())
 
 # plt.show()

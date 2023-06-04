@@ -33,8 +33,9 @@ scheduler = CosineAnnealingWarmupRestarts(optimizer,
                                           warmup_steps=len(train_dl)//2,
                                           cycle_mult = 1,
                                           max_lr = 1e-3,
-                                          min_lr =1e-5,
-                                            gamma = 1 )
+                                          min_lr =5e-4,
+                                            gamma = 1,
+                                            )
 
 model.to(device)
 model.train(True)
@@ -43,25 +44,26 @@ model.train(True)
 
 LR_history=[]
 loss_hist = []
-for epoch in range(2):
+for epoch in range(3):
     train_loss = 0
     i = 0
     print(f"Epoch {epoch}",flush=True)
     # for batch in tqdm(train_dl):
     for batch in train_dl:
                 i += 1
-                x,y  = batch
+                # x,y  = batch
                 
-                x = x.float().to(device); y = y.double().to(device)
+                # x = x.float().to(device); y = y.double().to(device)
 
-                pred = model(x).double()
-                optimizer.zero_grad()
-                loss = loss_fn(pred,y)
-                loss.backward()
-                optimizer.step()
-                scheduler.step()
-                train_loss += loss.item()
-                train_loss = loss.item()
+                # pred = model(x).double()
+                # optimizer.zero_grad()
+                # loss = loss_fn(pred,y)
+                # loss.backward()
+                # optimizer.step()
+                if epoch+1 != 3:
+                  scheduler.step()
+                # train_loss += loss.item()
+                # train_loss = loss.item()
     
     # loss_hist.append(train_loss/i)
                 loss_hist.append(train_loss)
@@ -70,24 +72,27 @@ for epoch in range(2):
                 print(f"Step:{i} Loss:{loss_hist[-1]}",flush=True)
                 # if i == num_step:
                     # break
+print("Check the state of optimizer:")
+for param_group in optimizer.param_groups:
+    
+      print(param_group['lr'])
+# torch.save(model,"/home/yuning/thesis/valid/models/23-2-16_{}.pt".format(model_name))
+# print("Training finished, model has been saved!")
 
-torch.save(model,"/home/yuning/thesis/valid/models/23-2-3_{}.pt".format(model_name))
-print("Training finished, model has been saved!")
-
-plt.figure(0,figsize=(12,10))
-plt.semilogy(loss_hist,"r",lw=2.5)
-plt.xlabel("Steps")
-plt.ylabel("Loss")
-plt.grid()
-plt.savefig("/home/yuning/thesis/valid/fig/23-2-3/loss{}".format(model_name))
+# plt.figure(0,figsize=(12,10))
+# plt.semilogy(loss_hist,"r",lw=2.5)
+# plt.xlabel("Steps")
+# plt.ylabel("Loss")
+# plt.grid()
+# plt.savefig("/home/yuning/thesis/valid/fig/23-2-16/loss{}".format(model_name))
 
 
 
 
 plt.figure(1)
-plt.plot(LR_history,lw=1.5)
+plt.semilogy(LR_history,lw=1.5)
 plt.xlabel("Epoch")
 plt.ylabel("Learning Rate")
 plt.grid()
-plt.savefig("/home/yuning/thesis/valid/fig/23-2-3/Lr_scheduler{}".format(model_name),bbox_inches ='tight')
+plt.savefig("/home/yuning/thesis/valid/fig/23-2-16/Lr_scheduler{}".format(model_name),bbox_inches ='tight')
 

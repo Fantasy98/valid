@@ -37,8 +37,8 @@ CH = 4
 PS = 16
 # x = torch.randn(size=(1,CH,H,W))
 
-# model = ViTBackbone(patch_size=PS,num_layers=1,h_dim=PS*PS,num_heads=8,n_channel= CH,max_seq_length=4096)
-model = ViT(patch_size=PS,num_layers=1,h_dim=PS*PS,num_heads=8,n_channel= CH,max_seq_length=4096)
+model = ViTBackbone(patch_size=PS,num_layers=1,h_dim=PS*PS,num_heads=8,n_channel= CH,max_seq_length=4096)
+# model = ViT(patch_size=PS,num_layers=1,h_dim=PS*PS,num_heads=8,n_channel= CH,max_seq_length=4096)
 
 out = model(x.float())
 # out  = out.reshape(1,3,256,256)

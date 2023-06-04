@@ -202,11 +202,18 @@ class ViT(nn.Module):
 
 class ViTBackbone(nn.Module):
     def __init__(self,patch_size,num_layers,h_dim,num_heads,n_channel,
-                 d_ff = 2048, max_seq_length= None, use_clf_token= False, dropout= 0.0,dropout_emb = 0.0) -> None:
+                 d_ff = 4096, max_seq_length= None, use_clf_token= False, dropout= 0.0,dropout_emb = 0.0) -> None:
         
         super(ViTBackbone,self).__init__()
 
-        self.vit = ViT(patch_size,num_layers,h_dim,num_heads,n_channel,d_ff,max_seq_length)
+        self.ps = patch_size
+        self.proc = Patchlize(patch_size,n_channel,h_dim)
+
+        self.enc = ViTransformerEncoder(num_layers, h_dim, num_heads,
+                                        d_ff=d_ff,
+                                        max_seq_steps=max_seq_length,
+                                        use_clf_token=use_clf_token,drop_out_emb=dropout_emb,dropout=dropout)
+        
 
 
         self.up = nn.Upsample(scale_factor=2,mode="bicubic")
@@ -223,11 +230,16 @@ class ViTBackbone(nn.Module):
         self.bn3 = nn.BatchNorm2d(n_channel,eps=1e-3,momentum=0.99)    
         self.bn4 = nn.BatchNorm2d(1,eps=1e-3,momentum=0.99)    
     def forward(self,x):
-        x = self.vit(x)
-        BS,PS2,L_dim = x.shape
-        
-        x = x.reshape(BS,L_dim//PS2,PS2,PS2)
-    
+
+
+        x = self.proc(x)
+        x = self.enc(x)
+        print(x.shape)
+        BS, PS2 ,L_dim = x.shape
+       
+        x = x.reshape(BS, L_dim , self.ps , self.ps)
+
+        print(x.shape)
         x_ = self.tconv0(x)
         x = F.elu(self.bn0(x_))
         x = self.up(x+x_)
@@ -245,8 +257,8 @@ class ViTBackbone(nn.Module):
         x = F.elu(self.bn3(x_))
         x = self.up(x+x_)
         
-        # x = self.tconv4(x)
-        # x = F.elu(self.bn4(x))
+        x = self.tconv4(x)
+        x = F.elu(self.bn4(x))
 
         return x
 

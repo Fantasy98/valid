@@ -142,7 +142,8 @@ class FCN_Pad_Xaiver_Shap(nn.Module):
 
     def forward(self, inputs):
 
-        padded = periodic_padding(inputs,self.padding)
+        # padded = periodic_padding(inputs,self.padding)
+        padded = inputs
         batch1 = self.initial_norm(padded)    
 
         cnn1 = self.elu(self.conv1(batch1))     
@@ -175,18 +176,16 @@ class FCN_Pad_Xaiver_Shap(nn.Module):
         x = self.out(torch.concat([padded,batch9],dim=1))
 
         #Corp the padding
-        out = x[:,
-                :,
-                self.padding:-self.padding,
-                self.padding:-self.padding]
-        print(x.shape)
-        x = out.squeeze(1)
+        # out = x[:,
+        #         :,
+        #         self.padding:-self.padding,
+        #         self.padding:-self.padding]
         print(x.shape)
         # x = torch.mean(x)
         # x = torch.mean(x,dim=1)
         # x  = x.unsqueeze(0)
         # x  = x.unsqueeze(0)
-        x  = x[:,128,128]
+        x  = x[:,:,128,128]
         print(x.shape)
-        return x.unsqueeze(0).unsqueeze(0)
+        return x
     

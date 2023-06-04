@@ -19,13 +19,26 @@ test_path = slice_dir(root_path,y_plus,var,target,"test",normalized)
 print(test_path)
 
 torch.manual_seed(100)
-test_dl = DataLoader(torch.load(test_path+"/test2.pt"),shuffle=True,batch_size=1)
+test_dl = DataLoader(torch.load(test_path+"/test1.pt"),shuffle=True,batch_size=1)
 
 #%%
 num_step = 2
-model_name = "y_plus_30_fullskipCCT_2layer_16heads_2epoch_1batch"
-model = torch.load("/home/yuning/thesis/valid/models/23-2-2_{}.pt".format(model_name))
+model_name = "y_plus_30_pr0025_Mul_CCT_2layer_16heads_1epoch_1batch"
+# model_name = "y_plus_50_pr02_fullskipCCT_2layer_16heads_1epoch_1batch"
+model = torch.load("/home/yuning/thesis/valid/models/23-2-20_{}.pt".format(model_name))
 model.eval()
+
+
+# from utils.networks import FCN_Pad_Xaiver_gain
+# model_name = "y_plus_30-VARS-pr0.025_u_vel_v_vel_w_vel-TARGETS-pr0.025_flux_EPOCH=100_state_dict"
+# model = FCN_Pad_Xaiver_gain(256,256,4,3,8)
+
+# model_state = torch.load("/home/yuning/thesis/valid/models/{}.pt".format(model_name))
+# model.load_state_dict(model_state)
+# model.cuda()
+# model.eval()
+# model_name = "y_plus_30-VARS-pr0025_u_vel_v_vel_w_vel-TARGETS-pr0025_flux_EPOCH=100_state_dict"
+
 # %%
 import numpy as np
 from utils.metrics import RMS_error 
@@ -40,33 +53,33 @@ with torch.no_grad():
 print(pred.shape)
 
 #%%
-tk1 = model.CCTEncoder.tokenizer
-tk = model.CCTEncoder   
-pred_trans = tk(x)
-    # pred_trans = pred_trans.squeeze().detach().cpu().numpy()
-pred_trans = pred_trans.transpose(2,1).reshape(4,256,256).detach().cpu().numpy()
-pred_transi = np.empty(shape=(4,256,256))
-import matplotlib.pyplot as plt
-for i in range(4):
-    plt.figure(i+10)
-    pred_transi[i,:,:] = pred_trans[i,:,:].T
-    # pred_transi = (pred_transi-pred_transi.min())/(pred_transi.max()-pred_transi.min())
-Plot_multi(pred_transi,["u","v","w",r"$\theta$"],save_dir="/home/yuning/thesis/valid/fig/23-2-6/{}_TransformerFeature{}".format(model_name,i))
+# tk1 = model.CCTEncoder.tokenizer
+# tk = model.CCTEncoder   
+# pred_trans = tk(x)
+#     # pred_trans = pred_trans.squeeze().detach().cpu().numpy()
+# pred_trans = pred_trans.transpose(2,1).reshape(4,256,256).detach().cpu().numpy()
+# pred_transi = np.empty(shape=(4,256,256))
+# import matplotlib.pyplot as plt
+# for i in range(4):
+#     plt.figure(i+10)
+#     pred_transi[i,:,:] = pred_trans[i,:,:].T
+#     # pred_transi = (pred_transi-pred_transi.min())/(pred_transi.max()-pred_transi.min())
+# Plot_multi(pred_transi,["u","v","w",r"$\theta$"],save_dir="/home/yuning/thesis/valid/fig/23-2-6/{}_TransformerFeature{}".format(model_name,i))
 
 
 
 
 #%%
 plt.figure(0)
-clb = Plot_2D_snapshots(pred.cpu().squeeze(),"/home/yuning/thesis/valid/fig/23-2-6/pred{}".format(model_name))
+clb = Plot_2D_snapshots(pred.cpu().squeeze(),"/home/yuning/thesis/valid/fig/23-2-20/pred{}".format(model_name))
 plt.colorbar(clb)
 
 plt.figure(1)
-clb = Plot_2D_snapshots(y.cpu().squeeze(),"/home/yuning/thesis/valid/fig/23-2-6/tar{}".format(model_name))
+clb = Plot_2D_snapshots(y.cpu().squeeze(),"/home/yuning/thesis/valid/fig/23-2-20/tar{}".format(model_name))
 plt.colorbar(clb)
 
 plt.figure(2)
-clb = Plot_2D_snapshots(pred.cpu().squeeze()-y.cpu().squeeze(),"/home/yuning/thesis/valid/fig/23-2-6/error{}".format(model_name))
+clb = Plot_2D_snapshots(pred.cpu().squeeze()-y.cpu().squeeze(),"/home/yuning/thesis/valid/fig/23-2-20/error{}".format(model_name))
 plt.colorbar(clb)
 # %%
 import numpy as np
@@ -80,6 +93,7 @@ for batch in tqdm(test_dl):
 
     with torch.no_grad():
         pred = model(x).double()
+
     rms = RMS_error(pred.cpu().squeeze().numpy(),y.cpu().squeeze().numpy())
     glbrms = Glob_error(pred.cpu().squeeze().numpy(),y.cpu().squeeze().numpy())
     flbrms = Fluct_error(pred.cpu().squeeze().numpy(),y.cpu().squeeze().numpy())

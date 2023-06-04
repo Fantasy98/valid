@@ -2,6 +2,7 @@
 import torch.nn as nn
 from transformer.transformer import Transformer
 from transformer.tokenizer import Tokenizer
+# from tokenizer import Tokenizer
 import math
 class CCT(nn.Module):
     def __init__(self,
@@ -35,6 +36,7 @@ class CCT(nn.Module):
                                    pooling_padding=pooling_padding,
                                    max_pool=True,
                                    activation=nn.PReLU,
+                                #    activation=nn.ReLU,
                                    n_conv_layers=n_conv_layers,
                                    conv_bias=False)
 
@@ -56,4 +58,3 @@ class CCT(nn.Module):
         x = self.tokenizer(x)
         # print(f"Token size{x.shape}")
         return self.encoder(x)
-

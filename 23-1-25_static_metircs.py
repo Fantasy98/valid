@@ -1,7 +1,7 @@
 #%%
 import numpy as np 
 import matplotlib.pyplot as plt
-from utils.metrics import ERS
+from utils.metrics import ERS,RMS_error
 import seaborn as sns
 from scipy.stats import pearsonr
 
@@ -13,6 +13,12 @@ y30_y_base = np.load("/home/yuning/thesis/valid/pred/y_plus_{}-VARS-pr{}_u_vel_v
 y30_pred_cbam = np.load("/home/yuning/thesis/valid/pred/y_plus_{}-VARS-pr{}_u_vel_v_vel_w_vel-TARGETS-pr{}_flux_CBAM2_EPOCH=100/pred.npy".format(y_plus,pr,pr))
 y30_pred_base = np.load("/home/yuning/thesis/valid/pred/y_plus_{}-VARS-pr{}_u_vel_v_vel_w_vel-TARGETS-pr{}_flux_FCN_EPOCH=100/pred.npy".format(y_plus,pr,pr))
 pr = "02"
+
+#%%
+e = RMS_error(y30_y_cb.mean(0),y30_pred_cbam.mean(0))
+print(e)
+e = RMS_error(y30_y_base.mean(0),y30_pred_base.mean(0))
+print(e)
 #%%
 PCC_Base = []
 PCC_CBAM = []

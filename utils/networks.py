@@ -18,7 +18,47 @@ def Init_Conv(m):
         nn.init.zeros_(m.bias)
         print("It has been initialized",flush=True)
     
+class FCN_4(nn.Module):
+    def __init__(self, height,width,channels,knsize,padding) -> None:
+        super(FCN_4,self).__init__()
+        self.height,self.width,self.channels = height,width,channels
+        self.knsize = knsize
+        self.padding = padding
 
+        self.conv1 = nn.Conv2d(in_channels=self.channels,out_channels=64,kernel_size=5,padding="same")
+        self.conv2 = nn.Conv2d(in_channels=64,out_channels=128,kernel_size=self.knsize,padding="same")
+        self.conv3 = nn.Conv2d(in_channels=128,out_channels=256,kernel_size=self.knsize,padding="same")
+        self.conv4 = nn.Conv2d(in_channels=256,out_channels=128,kernel_size=self.knsize,padding="same")
+        self.conv5 = nn.Conv2d(in_channels=128,out_channels=64,kernel_size=self.knsize,padding="same")
+
+        self.out = nn.Conv2d(in_channels=64,out_channels=1,kernel_size=1)
+
+        self.initial_norm = nn.BatchNorm2d(self.channels,eps=1e-3,momentum=0.99)
+        self.bn1 = nn.BatchNorm2d(64,eps=1e-3,momentum=0.99)  
+        self.bn2 = nn.BatchNorm2d(128,eps=1e-3,momentum=0.99)  
+        self.bn3 = nn.BatchNorm2d(256,eps=1e-3,momentum=0.99)  
+        self.bn4 = nn.BatchNorm2d(128,eps=1e-3,momentum=0.99)  
+    
+    def forward(self,input):
+        import torch.nn.functional as F
+        x = periodic_padding(input,self.padding)
+        x = self.initial_norm(x)
+        x = self.conv1(x)
+        x =F.elu(self.bn1(x))
+        x = self.conv2(x)
+        x =F.elu(self.bn2(x))
+        x = self.conv3(x)
+        x =F.elu(self.bn3(x))
+        x = self.conv4(x)
+        x =F.elu(self.bn4(x))
+        x = self.conv5(x)
+        x = self.out(x)
+        
+        return x[:,
+                :,
+                self.padding:-self.padding,
+                self.padding:-self.padding
+                ]
 
 class FCN(nn.Module):
     def __init__(self, height,width,channels,knsize) -> None:

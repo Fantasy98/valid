@@ -22,10 +22,10 @@ def Fluct_error(y_pred,y_true):
 
 def ERS(y_pred,y_true):
   if y_pred.shape == y_true.shape and len(y_pred.shape)==2:  
-    return 100 * np.abs(y_pred - y_true)/np.mean(y_true)
+    return 100*np.abs(y_pred - y_true)/np.mean(y_true)
 
 def PCC(y_pred,y_true):
   from scipy.stats import pearsonr
-  if y_pred.shape == y_true.shape and len(y_pred.shape)==2: 
-    p,r =  pearsonr(y_pred.flatten(),y_true.flatten())
-    return p
+  # if y_pred.shape == y_true.shape and len(y_pred.shape)==2: 
+  p,r =  pearsonr(y_pred.flatten(),y_true.flatten())
+  return p

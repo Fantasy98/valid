@@ -1,16 +1,9 @@
 #%%
-import torch 
+import numpy as np 
+import matplotlib.pyplot as plt 
+from scipy.signal import correlate2d
 import os
-from torch import nn 
-from utils.networks import FCN
-from utils.datas import slice_dir
-from torch.utils.data import DataLoader
 from tqdm import tqdm
-import matplotlib.pyplot as plt
-import shap
-import numpy as np
-from scipy import signal
-from utils.plots import Plot_2D_snapshots,Plot_multi
 #%%
 save_fig = "fig/23-2-23/"
 names = ["vit_16h_4l","fcn","cbam","cnn"]
@@ -28,8 +21,6 @@ for pr in prs:
     pr_path = os.path.join(np_path,f"pr{pr}.npy")
     pr_np = np.load(pr_path)
     FeatureCorr.append(pr_np)
-#%%
-
 # %%
 def Plot_Gradient_Map(U,names,save_dir):
     from matplotlib import cbook
@@ -116,7 +107,13 @@ def Plot_Gradient_Map(U,names,save_dir):
         axes[i].axis("off")
     cbar =fig.colorbar(surf,ax=axes.flatten().tolist(),aspect =30,shrink=0.9,orientation="horizontal",location="bottom")
     # cbar.formatter.set_powerlimits((0,0))
-    fig.savefig(save_dir,bbox_inches="tight")     
+    fig.savefig(save_dir,bbox_inches="tight") 
+#%%
+for idx in range(4):
+    Plot_Gradient_Map(FeatureCorr[idx][:,118:138,118:138],["U","V","W",r"${\theta}$"],f"pr={prs[idx]}")
 # %%
-# Plot_Gradient_Map((pr071_np-pr071_np.min())/(pr071_np.max()-pr071_np.min()),["u","v","w",r"$\theta$"],"y30_Pr071")
+for idx in range(4):
+    U = np.array([FeatureCorr[i][idx,118:138,118:138]for i in range(4)])
+    Plot_Gradient_Map(U,["Pr=0.025","Pr=0.2","Pr=0.71","Pr=1"],f"pr={prs[idx]}")
+
 # %%

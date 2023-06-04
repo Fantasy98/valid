@@ -36,7 +36,8 @@ class Tokenizer(nn.Module):
 
         # --> [B,C,H*W]
         self.flattener = nn.Flatten(2, 3)
-        self.BatchNorm = nn.BatchNorm2d(num_features=n_input_channels,eps=0.01,momentum=0.99)
+        # eps = 1e-3 default
+        self.BatchNorm = nn.BatchNorm2d(num_features=n_input_channels,eps=1e-3,momentum=0.99)
         self.apply(self.init_weight)
 
     def sequence_length(self, n_channels=4, height=256, width=256):

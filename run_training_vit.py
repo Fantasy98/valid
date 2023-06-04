@@ -16,7 +16,6 @@ import einops
 from tensorflow.keras.callbacks import ModelCheckpoint, LearningRateScheduler
 from keras import backend as K
 
-
 os.environ["CUDA_VISIBLE_DEVICES"]='0,1,2,3'
 
 physical_devices = tf.config.list_physical_devices('GPU')
@@ -88,7 +87,7 @@ def main(epochs):
                 
                 j += 1
         
-        optimizer = tfa.optimizers.AdamW(learning_rate=start_lr, weight_decay=weight_decay,exclude_from_weight_decay])
+        optimizer = tfa.optimizers.AdamW(learning_rate=start_lr, weight_decay=[weight_decay,exclude_from_weight_decay])
         # optimizer.exclude_from_weight_decay(var_list = exclude_list,var_names=None)
 
         ##### Compile model #####

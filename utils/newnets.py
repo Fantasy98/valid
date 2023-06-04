@@ -323,7 +323,95 @@ class Res4_Partial(nn.Module):
 
 
 
+class FCN_Pad_Xaiver_CBAM2(nn.Module):
+    def __init__(self, height,width,channels,knsize,padding) -> None:
+        super(FCN_Pad_Xaiver_CBAM2,self).__init__()
+        self.height = height
+        self.width = width
+        self.channels = channels
+        self.knsize = knsize
+        self.padding = padding
+        
+        self.conv1 = nn.Conv2d(in_channels=self.channels,out_channels=64,kernel_size=5)
+        # self.cb1 = CBAM(64,1,5)
+        self.conv2 = nn.Conv2d(in_channels=64,out_channels=128,kernel_size=self.knsize)
+        # self.cb2 = CBAM(128,1,knsize)
+        self.conv3 = nn.Conv2d(in_channels=128,out_channels=256,kernel_size=self.knsize)
+        # self.cb3 = CBAM(256,1,knsize)
+        self.conv4 = nn.Conv2d(in_channels=256,out_channels=256,kernel_size=self.knsize)
+        self.cb4 = CBAM(256,1,knsize)
+        # self.conv5 = nn.Conv2d(in_channels=256,out_channels=128,kernel_size=self.knsize)
+        # self.cb5 = CBAM(128,1,knsize)
+        
+        self.Tconv1 = nn.ConvTranspose2d(in_channels=256*2,out_channels=128,kernel_size=self.knsize)
+        self.tcb1 = CBAM(128,1,knsize)
+        self.Tconv2 = nn.ConvTranspose2d(in_channels=256+128,out_channels=256,kernel_size=self.knsize)
+        # self.tcb2 = CBAM(256,1,knsize)
+        self.Tconv3 = nn.ConvTranspose2d(in_channels=128+256,out_channels=256,kernel_size=self.knsize)
+        # self.tcb3 = CBAM(256,1,knsize)
+        self.Tconv4 = nn.ConvTranspose2d(in_channels=64+256,out_channels=64,kernel_size=5)
+        # self.tcb4 = CBAM(64,1,5)
+        self.out = nn.ConvTranspose2d(in_channels=64+channels,out_channels=1,kernel_size=1)
 
+        self.initial_norm = nn.BatchNorm2d(self.channels,eps=1e-3,momentum=0.99)
+        self.bn1 = nn.BatchNorm2d(64,eps=1e-3,momentum=0.99)  
+        self.bn2 = nn.BatchNorm2d(128,eps=1e-3,momentum=0.99)  
+        self.bn3 = nn.BatchNorm2d(256,eps=1e-3,momentum=0.99)  
+        self.bn4 = nn.BatchNorm2d(256,eps=1e-3,momentum=0.99)  
+        # self.bn5 = nn.BatchNorm2d(128,eps=1e-3,momentum=0.99)
+
+        self.cbn3 = nn.BatchNorm2d(256,eps=1e-3,momentum=0.99)
+        self.cbn4 = nn.BatchNorm2d(256,eps=1e-3,momentum=0.99)
+        
+        self.tbn1 = nn.BatchNorm2d(128,eps=1e-3,momentum=0.99) 
+        self.tcbn1 = nn.BatchNorm2d(128,eps=1e-3,momentum=0.99) 
+        self.tbn2 = nn.BatchNorm2d(256,eps=1e-3,momentum=0.99)  
+        self.tcbn2 = nn.BatchNorm2d(256,eps=1e-3,momentum=0.99)  
+        self.tbn3 = nn.BatchNorm2d(256,eps=1e-3,momentum=0.99)  
+        self.tbn4 = nn.BatchNorm2d(64,eps=1e-3,momentum=0.99)  
+
+        self.elu = nn.ELU()
+
+   
+    def forward(self, inputs):
+        padded = periodic_padding(inputs,self.padding)
+
+        batch = self.initial_norm(padded)    
+        cnn1 = (self.conv1(batch))
+        batch =self.elu(self.bn1(cnn1))
+        
+        cnn2 = (self.conv2(batch))
+        batch= self.elu(self.bn2(cnn2))
+        
+        cnn3 = (self.conv3(batch))
+        batch = self.elu(self.bn3(cnn3)) 
+
+        cnn4 = (self.conv4(batch))
+        cnn4 = self.cb4(cnn4)
+        batch = self.elu(self.bn4(cnn4))
+        batch = self.cb4(batch)
+        tconv1 = (self.Tconv1(torch.concat([cnn4,batch],dim=1)))
+        batch = self.elu(self.tbn1(tconv1))
+        batch =  self.tcb1(batch)
+
+        tconv2 = (self.Tconv2(torch.concat([cnn3,batch],dim=1)))
+        batch =self.elu(self.tbn2(tconv2))
+        
+        tconv3 = (self.Tconv3(torch.concat([cnn2,batch],dim =1 )))
+        batch = self.elu(self.tbn3(tconv3))
+               
+        tconv4 = (self.Tconv4(torch.concat([cnn1,batch],dim=1)))
+        batch = self.elu(self.tbn4(tconv4))
+    
+        x = self.out(torch.concat([padded,batch],dim=1))
+
+        #Corp the padding
+        out = x[:,
+                :,
+                self.padding:-self.padding,
+                self.padding:-self.padding]
+        
+        return out
 
 
 
@@ -342,7 +430,7 @@ class FCN_Pad_Xaiver_CBAM(nn.Module):
         self.conv2 = nn.Conv2d(in_channels=64,out_channels=128,kernel_size=self.knsize)
         # self.cb2 = CBAM(128,1,knsize)
         self.conv3 = nn.Conv2d(in_channels=128,out_channels=256,kernel_size=self.knsize)
-        self.cb3 = CBAM(256,1,knsize)
+        # self.cb3 = CBAM(256,1,knsize)
         self.conv4 = nn.Conv2d(in_channels=256,out_channels=256,kernel_size=self.knsize)
         self.cb4 = CBAM(256,1,knsize)
         # self.conv5 = nn.Conv2d(in_channels=256,out_channels=128,kernel_size=self.knsize)
@@ -351,7 +439,7 @@ class FCN_Pad_Xaiver_CBAM(nn.Module):
         self.Tconv1 = nn.ConvTranspose2d(in_channels=256*2,out_channels=128,kernel_size=self.knsize)
         self.tcb1 = CBAM(128,1,knsize)
         self.Tconv2 = nn.ConvTranspose2d(in_channels=256+128,out_channels=256,kernel_size=self.knsize)
-        self.tcb2 = CBAM(256,1,knsize)
+        # self.tcb2 = CBAM(256,1,knsize)
         self.Tconv3 = nn.ConvTranspose2d(in_channels=128+256,out_channels=256,kernel_size=self.knsize)
         # self.tcb3 = CBAM(256,1,knsize)
         self.Tconv4 = nn.ConvTranspose2d(in_channels=64+256,out_channels=64,kernel_size=5)
